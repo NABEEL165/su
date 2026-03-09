@@ -853,6 +853,77 @@
             display: block;
         }
 
+        /* Notification Dropdown - match customer dashboard style */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 350px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+            margin-top: 0.5rem;
+        }
+
+        .notification-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-time {
+            font-size: 0.7rem;
+            color: #999;
+        }
+
         .btn {
             background: linear-gradient(135deg, #4CAF50, #2196F3);
             color: white;
@@ -1084,20 +1155,58 @@
             </div>
 
 
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Search customers, collectors, or data...">
-            </div>
+            <!--<div class="search-container">-->
+            <!--    <i class="fas fa-search search-icon"></i>-->
+            <!--    <input type="text" class="search-input" placeholder="Search customers, collectors, or data...">-->
+            <!--</div>-->
         </div>
 
         <div class="navbar-right">
-            <button class="notification-btn" onclick="toggleMobileSearch()">
-                <i class="fas fa-search"></i>
-            </button>
-            <button class="notification-btn">
-                <i class="fas fa-bell"></i>
-                <div class="notification-badge">3</div>
-            </button>
+            <!--<button class="notification-btn" onclick="toggleMobileSearch()">-->
+            <!--    <i class="fas fa-search"></i>-->
+            <!--</button>-->
+            <div style="position: relative;">
+                <button class="notification-btn" onclick="toggleAdminNotifications()">
+                    <i class="fas fa-bell"></i>
+                    {% if notifications %}
+                    <div class="notification-badge">{{ notifications|length }}</div>
+                    {% endif %}
+                </button>
+                <div class="notification-dropdown" id="adminNotificationDropdown" style="right: 0; left: auto; min-width: 320px;">
+                    <div class="notification-header">Notifications</div>
+                    <div class="notification-list">
+                        {% if notifications %}
+                            {% for n in notifications %}
+                            <div class="notification-item">
+                                <div class="notification-icon
+                                    {% if n.notification_type == 'order_completed' %}icon-green{% elif n.notification_type == 'pending_order' %}icon-orange{% elif n.notification_type == 'collection_rate' %}icon-purple{% else %}icon-blue{% endif %}">
+                                    <i class="fas fa-{{ n.icon|default:'bell' }}"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        {{ n.title }}
+                                    </div>
+                                    <div class="notification-text">
+                                        {{ n.message }}
+                                    </div>
+                                    <div class="notification-time">
+                                        {{ n.created_at|timesince }} ago
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="notification-item">
+                                <div class="notification-content">
+                                    <div class="notification-text">
+                                        No notifications yet. Pending orders, completed orders, and rate alerts will appear here.
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
             <div class="profile-dropdown" onclick="toggleProfileDropdown()">
                 <div class="profile-trigger">
                     <div class="profile-avatar">
@@ -1170,11 +1279,11 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="{% url 'super_admin_dashboard:view_customer_waste_info' %}" class="nav-link"
-                        onclick="showContent('waste-info')">
-                        <i class="fas fa-file-alt nav-icon"></i>
-                        <span class="nav-text">Waste Information</span>
-                    </a>
+                    <!--<a href="{% url 'super_admin_dashboard:view_customer_waste_info' %}" class="nav-link"-->
+                    <!--    onclick="showContent('waste-info')">-->
+                    <!--    <i class="fas fa-file-alt nav-icon"></i>-->
+                    <!--    <span class="nav-text">Waste Information</span>-->
+                    <!--</a>-->
                 </div>
                 <div class="nav-item">
                     <a href="{% url 'super_admin_dashboard:view_collected_data' %}" class="nav-link"
@@ -1617,6 +1726,14 @@
         function toggleMobileSearch() {
             const mobileSearch = document.getElementById('mobileSearch');
             mobileSearch.classList.toggle('active');
+        }
+
+        // Admin notification dropdown toggle
+        function toggleAdminNotifications() {
+            const dropdown = document.getElementById('adminNotificationDropdown');
+            if (!dropdown) return;
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
         }
 
         // About Us Modal Functions
