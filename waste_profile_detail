@@ -424,10 +424,10 @@
                 {% endif %}
 
                 <div class="actions">
-                    <a href="{% url 'customer:waste_profile_update' info.id %}" class="btn btn-primary">
-                        <i class="fas fa-edit"></i>
-                        Edit Profile
-                    </a>
+                    <!--<a href="{% url 'customer:waste_profile_update' info.id %}" class="btn btn-primary">-->
+                    <!--    <i class="fas fa-edit"></i>-->
+                    <!--    Edit Profile-->
+                    <!--</a>-->
                     <a href="{% url 'payments:initiate_payment' info.id %}" class="btn btn-success">
                         <i class="fas fa-credit-card"></i>
                         Add Wallet
@@ -452,10 +452,12 @@
                     </a>
                     {% endif %}
 
-                    <a href="{% url 'customer:waste_profile_delete' info.id %}" class="btn btn-danger">
-                        <i class="fas fa-trash"></i>
-                        Delete Profile
-                    </a>
+                    <!--<a href="{% url 'customer:waste_profile_delete' info.id %}" class="btn btn-danger">-->
+                    <!--    <i class="fas fa-trash"></i>-->
+                    <!--    Delete Profile-->
+                    <!--</a>-->
+
+
                 </div>
             </div>
         </div>
