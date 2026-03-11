@@ -721,6 +721,27 @@
                     <small style="color: #4CAF50; display: block; margin-top: 5px;">
                         <i class="fas fa-user"></i> {{ customer_waste_info.full_name }}
                     </small>
+                    <script>
+                        // Auto-select customer if customer_waste_info is available
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const customerSelect = document.querySelector('select[name="customer"]');
+                            const customerId = "{{ customer_waste_info.user.id }}";
+
+                            if (customerSelect && customerId) {
+                                // Try to find and select the customer option
+                                const options = customerSelect.options;
+                                for (let i = 0; i < options.length; i++) {
+                                    if (options[i].value == customerId) {
+                                        customerSelect.value = customerId;
+                                        customerSelect.classList.add('auto-filled');
+                                        // Trigger change event to update wallet balance
+                                        customerSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                                        break;
+                                    }
+                                }
+                            }
+                        });
+                    </script>
                     {% endif %}
                     </p>
                     <p>
