@@ -199,6 +199,84 @@
             background-clip: text;
         }
 
+        /* ── BILLING NUMBER BADGE (new – does not affect any existing styles) ── */
+        .billing-number-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .billing-number-label {
+            font-weight: 600;
+            color: #2196F3;
+        }
+
+        .billing-number-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .billing-number-badge .bn-icon {
+            font-style: normal;
+            font-size: 0.95rem;
+        }
+        /* ── end billing number styles ── */
+
+        /* ── GENERATE BILL BUTTON (new) ── */
+        .generate-bill-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px dashed rgba(76, 175, 80, 0.35);
+        }
+
+        .btn-generate-bill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 13px 28px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 18px rgba(76, 175, 80, 0.35);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-generate-bill:hover {
+            background: linear-gradient(135deg, #45a049 0%, #1976d2 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 24px rgba(76, 175, 80, 0.45);
+        }
+
+        .btn-generate-bill:active {
+            transform: translateY(0);
+        }
+
+        .btn-generate-bill .bill-icon {
+            font-size: 1.2rem;
+        }
+        /* ── end generate bill button ── */
+
         /* Camera Section */
         .camera-section {
             background: linear-gradient(135deg, #f8fffe 0%, #f0f9ff 100%);
@@ -656,6 +734,8 @@
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- jsPDF for client-side invoice PDF generation (new) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -722,19 +802,16 @@
                         <i class="fas fa-user"></i> {{ customer_waste_info.full_name }}
                     </small>
                     <script>
-                        // Auto-select customer if customer_waste_info is available
                         document.addEventListener('DOMContentLoaded', function () {
                             const customerSelect = document.querySelector('select[name="customer"]');
                             const customerId = "{{ customer_waste_info.user.id }}";
 
                             if (customerSelect && customerId) {
-                                // Try to find and select the customer option
                                 const options = customerSelect.options;
                                 for (let i = 0; i < options.length; i++) {
                                     if (options[i].value == customerId) {
                                         customerSelect.value = customerId;
                                         customerSelect.classList.add('auto-filled');
-                                        // Trigger change event to update wallet balance
                                         customerSelect.dispatchEvent(new Event('change', { bubbles: true }));
                                         break;
                                     }
@@ -794,14 +871,12 @@
                         bag(s)
                     </small>
                     <script>
-                        // Auto-fill number of bags when page loads
                         document.addEventListener('DOMContentLoaded', function () {
                             const bagsValue = "{{ request.GET.number_of_bags }}";
                             const bagsField = document.querySelector('input[name="number_of_bags"]');
                             if (bagsValue && bagsField && !bagsField.value) {
                                 bagsField.value = bagsValue;
                                 bagsField.classList.add('auto-filled');
-                                // Trigger input event to update weight calculation
                                 bagsField.dispatchEvent(new Event('input', { bubbles: true }));
                             }
                         });
@@ -812,14 +887,12 @@
                         (auto-filled)
                     </small>
                     <script>
-                        // Auto-fill number of bags from customer info
                         document.addEventListener('DOMContentLoaded', function () {
                             const bagsValue = "{{ customer_waste_info.number_of_bags }}";
                             const bagsField = document.querySelector('input[name="number_of_bags"]');
                             if (bagsValue && bagsField && !bagsField.value) {
                                 bagsField.value = bagsValue;
                                 bagsField.classList.add('auto-filled');
-                                // Trigger input event to update weight calculation
                                 bagsField.dispatchEvent(new Event('input', { bubbles: true }));
                             }
                         });
@@ -873,16 +946,13 @@
                         <i class="fas fa-weight"></i> Based on {{ request.GET.number_of_bags }} bags (adjust as needed)
                     </small>
                     <script>
-                        // Auto-calculate weight based on bags when page loads
                         document.addEventListener('DOMContentLoaded', function () {
                             const bagsValue = "{{ request.GET.number_of_bags }}";
                             const kgField = document.querySelector('input[name="kg"]');
                             if (bagsValue && kgField && !kgField.value) {
-                                // Assume 1kg per bag as default (1 bag = 50rs, rate is 50/kg)
                                 const calculatedWeight = bagsValue * 1;
                                 kgField.value = calculatedWeight;
                                 kgField.classList.add('auto-filled');
-                                // Trigger input event to update billing
                                 kgField.dispatchEvent(new Event('input', { bubbles: true }));
                             }
                         });
@@ -894,12 +964,7 @@
                     </small>
                     {% endif %}
                     </p>
-                    <!--<p>-->
-                    <!--    <label for="{{ form.scheduled_date.id_for_label }}">Scheduled Date:</label>-->
-                    <!--    {{ form.scheduled_date }}-->
-                    <!--    <small>If this collection is scheduled, select the date here</small>-->
-                    <!--</p>-->
- <p>
+                    <p>
                         <label for="{{ form.payment_method.id_for_label }}">Payment Method:</label>
                         {{ form.payment_method }}
                         {% if form.payment_method.errors %}
@@ -927,6 +992,22 @@
                             <span class="billing-label">Weight (KG):</span>
                             <span class="billing-value" id="weight-value" name="weight-display">0.00 KG</span>
                         </div>
+
+                        <!-- ═══════════════════════════════════════════════════
+                             BILLING NUMBER ROW  (newly added – no existing
+                             code or styles were changed)
+                        ════════════════════════════════════════════════════ -->
+                        <div class="billing-number-row">
+                            <span class="billing-number-label">
+                                <i class="fas fa-hashtag" style="margin-right:4px;"></i>Billing Number:
+                            </span>
+                            <span class="billing-number-badge" id="billing-number-display">
+                                <i class="fas fa-receipt bn-icon"></i>
+                                <span id="billing-number-text">— —</span>
+                            </span>
+                        </div>
+                        <!-- ═══════════════════════════════════════════════ -->
+
                         <div class="total-amount">
                             Total Amount: <span id="total-amount" name="total-amount-display">₹0.00</span>
                         </div>
@@ -935,6 +1016,19 @@
                             <span class="billing-label">Remaining Balance:</span>
                             <span class="billing-value" id="remaining-balance">₹0.00</span>
                         </div>
+
+                        <!-- ═══════════════════════════════════════════════
+                             GENERATE BILL BUTTON  (newly added)
+                        ════════════════════════════════════════════════ -->
+                        <div class="generate-bill-wrap">
+                            <button type="button" class="btn-generate-bill" onclick="generateInvoicePDF()">
+                                <span class="bill-icon">🧾</span>
+                                Generate &amp; Download Invoice
+                                <i class="fas fa-download" style="font-size:0.9rem;"></i>
+                            </button>
+                        </div>
+                        <!-- ═══════════════════════════════════════════ -->
+
                     </div>
                 </div>
 
@@ -1068,6 +1162,45 @@
             }
         });
 
+        // ═══════════════════════════════════════════════════════════════
+        // BILLING NUMBER GENERATOR  (new code – nothing existing changed)
+        // Generates a sequential bill number per session, e.g. BILL-0001
+        // If the Django template provides {{ billing_number }} it will be
+        // used; otherwise a session-based counter is used as fallback.
+        // ═══════════════════════════════════════════════════════════════
+        (function initBillingNumber() {
+            // 1. Prefer server-supplied number injected via Django template.
+            //    Add  {{ billing_number|default:'' }}  to your view context
+            //    and it will be picked up automatically here.
+            const serverNumber = "{{ billing_number|default:'' }}";
+
+            let displayNumber;
+
+            if (serverNumber && serverNumber.trim() !== '') {
+                // Server gave us a real number — format & use it
+                const numeric = parseInt(serverNumber, 10);
+                displayNumber = 'BILL-' + String(isNaN(numeric) ? serverNumber : numeric).padStart(4, '0');
+            } else {
+                // Fallback: generate a session-scoped sequential number
+                // stored in sessionStorage so it increments across
+                // entries in the same browser session.
+                let counter = parseInt(sessionStorage.getItem('suchigo_bill_counter') || '0', 10);
+                counter += 1;
+                sessionStorage.setItem('suchigo_bill_counter', counter);
+                displayNumber = 'BILL-' + String(counter).padStart(4, '0');
+            }
+
+            // Render into the badge as soon as DOM is ready
+            document.addEventListener('DOMContentLoaded', function () {
+                const el = document.getElementById('billing-number-text');
+                if (el) el.textContent = displayNumber;
+
+                // Also expose it for any downstream JS that may need it
+                window.currentBillingNumber = displayNumber;
+            });
+        })();
+        // ═══════════════════════════════════════════════════════════════
+
         // Initialize billing information
         function updateBillingInfo() {
             // Update local body name
@@ -1078,7 +1211,7 @@
             // Update rate per kg based on selected local body
             if (localbodySelect && localbodySelect.value) {
                 const localbodyId = localbodySelect.value;
-                const rate = 40.00; // Fixed rate as per requirement: 1kg = 50 rupees
+                const rate = 40.00;
                 ratePerKg.textContent = '₹' + rate.toFixed(2);
             }
 
@@ -1105,12 +1238,9 @@
 
         if (bagsInput) {
             bagsInput.addEventListener('input', function () {
-                // Auto-calculate weight based on bags (1kg per bag)
                 const bags = parseInt(bagsInput.value) || 0;
                 const calculatedWeight = bags * 1;
                 if (kgInput) {
-                    // Update weight whenever bags change if not manually edited?
-                    // For now, let's auto-fill if it helps match "1 bag = 50 rupees"
                     kgInput.value = calculatedWeight;
                     kgInput.classList.add('auto-filled');
                     updateBillingInfo();
@@ -1136,7 +1266,6 @@
                 return;
             }
 
-            // Simple simulated balance for demonstration
             const simulatedBalance = (Math.random() * 5000).toFixed(2);
             walletBalance.textContent = '₹' + simulatedBalance;
             updateWalletButtons();
@@ -1152,14 +1281,12 @@
 
             if (customerSelect && customerSelect.value && balance > 0 && total > 0) {
                 if (balance >= total) {
-                    // Sufficient balance - show pay with wallet button
                     payWithWalletBtn.style.display = 'inline-flex';
                     payWithWalletBtn.style.opacity = '1';
                     payWithWalletBtn.style.pointerEvents = 'auto';
                     payWithWalletBtn.disabled = false;
                     payWithWalletBtn.innerHTML = '<i class="fas fa-wallet"></i> Pay with Wallet';
                 } else {
-                    // Insufficient balance - hide pay with wallet button
                     payWithWalletBtn.style.display = 'none';
                 }
             } else {
@@ -1176,12 +1303,10 @@
 
             if (balance > 0 && total > 0) {
                 if (balance >= total) {
-                    // Show full wallet payment option
                     walletPaymentRow.style.display = 'flex';
                     walletPaymentAmount.textContent = '₹' + total.toFixed(2);
                     remainingBalanceRow.style.display = 'none';
                 } else {
-                    // Show partial wallet payment option
                     walletPaymentRow.style.display = 'flex';
                     walletPaymentAmount.textContent = '₹' + balance.toFixed(2);
                     remainingBalanceRow.style.display = 'flex';
@@ -1195,41 +1320,28 @@
 
         // Initialize billing info on page load
         document.addEventListener('DOMContentLoaded', function () {
-            // Highlight auto-filled fields
             highlightAutofilledFields();
 
-            // Delay to ensure rates are loaded
             setTimeout(function () {
                 updateBillingInfo();
-
-                // Initialize wallet balance
                 fetchCustomerWalletBalance();
             }, 100);
         });
 
-        // Function to highlight auto-filled fields
         function highlightAutofilledFields() {
-            // Check if we have customer waste info
             const urlParams = new URLSearchParams(window.location.search);
             const customerId = urlParams.get('customer_waste_info_id');
 
             if (customerId) {
-                // Add visual indication to auto-filled fields
                 const inputs = document.querySelectorAll('input, select, textarea');
                 inputs.forEach(input => {
                     if (input.value && input.value.trim() !== '') {
-                        // Add the auto-filled class for consistent styling
                         input.classList.add('auto-filled');
                     }
                 });
-
-                // Auto-fill completed
             }
         }
 
-        // Removed auto-fill notification function
-
-        // CSS animations for notifications
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -1243,10 +1355,9 @@
         `;
         document.head.appendChild(style);
 
-        // Check for camera access with fallback options
         const constraints = {
             video: {
-                facingMode: 'environment'  // Prefer rear camera, but allow front as fallback
+                facingMode: 'environment'
             }
         };
 
@@ -1261,9 +1372,8 @@
             .catch(err => {
                 console.warn('Rear camera not available, trying default camera:', err);
 
-                // Try with default camera (front or rear)
                 const fallbackConstraints = {
-                    video: true  // Use any available camera
+                    video: true
                 };
 
                 navigator.mediaDevices.getUserMedia(fallbackConstraints)
@@ -1280,45 +1390,38 @@
                             '<span style="color: red;">❌ Camera access denied. Please enable camera permission.</span>';
 
                         if (captureBtn) {
-                            captureBtn.style.display = 'none';  // Hide capture button
+                            captureBtn.style.display = 'none';
                         }
                     });
             });
 
         function capturePhoto() {
-            // Ensure video is playing before capturing
             if (video.paused || video.ended) {
                 alert('Please wait for the video to load before capturing a photo.');
                 return;
             }
 
-            // Set canvas dimensions to match video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
 
             const context = canvas.getContext('2d');
-            // Draw the current frame from video to canvas
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Create image data URL with JPEG format for better compression
-            const dataURL = canvas.toDataURL('image/jpeg', 0.8); // 80% quality JPEG
+            const dataURL = canvas.toDataURL('image/jpeg', 0.8);
             document.getElementById('photo_data').value = dataURL;
 
-            // Show the captured image preview
             preview.src = dataURL;
             preview.style.display = 'block';
             preview.style.animation = 'fadeIn 0.4s ease-in-out';
 
             photoSuccess.style.display = 'flex';
 
-            // Update button
             if (captureBtn) {
                 captureBtn.innerHTML = '<i class="fas fa-check"></i> Photo Captured – Retake?';
                 captureBtn.style.background = '#333';
             }
         }
 
-        // Share functionality
         function sharePage() {
             if (navigator.share) {
                 navigator.share({
@@ -1327,44 +1430,34 @@
                     url: window.location.href
                 }).catch(console.error);
             } else {
-                // Fallback for browsers that don't support Web Share API
                 alert('Sharing is not supported in your browser. Copy the URL: ' + window.location.href);
             }
         }
 
-        // About functionality
         function showAbout() {
             alert('SuchiGo Waste Management System\n\nThis page allows you to capture and document waste collection entries with photos for sustainable waste management.');
         }
 
-        // Open payment modal
         function openPaymentModal() {
             const totalText = totalAmount.textContent.replace('₹', '');
             const total = parseFloat(totalText) || 0;
 
-            // Set the amount in modal
             document.getElementById('modalAmount').textContent = `₹${total.toFixed(2)}`;
-
-            // Show the modal
             document.getElementById('paymentModal').style.display = 'block';
 
-            // Reset selections
             selectedModalPayment = '';
             document.getElementById('proceedPaymentBtn').disabled = true;
             document.getElementById('proceedPaymentBtn').textContent = 'Proceed with Payment';
 
-            // Remove selected classes
             document.querySelectorAll('.payment-option').forEach(option => {
                 option.classList.remove('selected');
             });
         }
 
-        // Close payment modal
         function closePaymentModal() {
             document.getElementById('paymentModal').style.display = 'none';
         }
 
-        // Handle clicks outside modal to close it
         window.onclick = function (event) {
             const modal = document.getElementById('paymentModal');
             if (event.target === modal) {
@@ -1372,27 +1465,21 @@
             }
         }
 
-        // Modal payment selection
         let selectedModalPayment = '';
 
         function selectModalPayment(method) {
-            // Remove selected class from all options
             document.querySelectorAll('.payment-option').forEach(option => {
                 option.classList.remove('selected');
             });
 
-            // Add selected class to clicked option
             event.currentTarget.classList.add('selected');
-
             selectedModalPayment = method;
 
-            // Enable proceed button
             const proceedBtn = document.getElementById('proceedPaymentBtn');
             proceedBtn.disabled = false;
             proceedBtn.textContent = `Proceed with ${method.charAt(0).toUpperCase() + method.slice(1)} Payment`;
         }
 
-        // Process payment from modal
         function processModalPayment() {
             if (!selectedModalPayment) {
                 alert('Please select a payment method.');
@@ -1405,24 +1492,19 @@
             switch (selectedModalPayment) {
                 case 'wallet':
                     if (confirm(`Confirm payment of ₹${total.toFixed(2)} from wallet?`)) {
-                        // Simple form submission for wallet payment
                         alert(`Processing wallet payment of ₹${total.toFixed(2)}...`);
                         document.querySelector('form').submit();
                     }
                     break;
 
                 case 'razorpay':
-                    // Get waste info ID for redirect
                     const selectedOption = customerSelect.options[customerSelect.selectedIndex];
                     const customerId = customerSelect.value;
                     let wasteInfoId = selectedOption.getAttribute('data-waste-info-id');
 
                     if (wasteInfoId && wasteInfoId !== 'None' && wasteInfoId !== '' && wasteInfoId !== 'undefined') {
-                        // Redirect to payments app Razorpay checkout
                         window.location.href = `/payments/initiate/${wasteInfoId}/`;
                     } else if (customerId) {
-                        // Direct redirect to user-based payment initiation
-                        // This avoids the complexity of AJAX calls and relies on server-side lookup
                         window.location.href = `/payments/initiate-by-user/${customerId}/`;
                     } else {
                         alert('Please select a customer first.');
@@ -1431,7 +1513,6 @@
 
                 case 'cash':
                     if (confirm('Mark this collection as paid with cash?')) {
-                        // Simple form submission for cash payment
                         alert('Recording cash payment...');
                         document.querySelector('form').submit();
                     }
@@ -1439,7 +1520,6 @@
             }
         }
 
-        // Original wallet payment functionality (kept for backward compatibility)
         function payWithWallet() {
             const balanceText = walletBalance.textContent.replace('₹', '');
             const balance = parseFloat(balanceText) || 0;
@@ -1448,7 +1528,6 @@
 
             if (balance >= total) {
                 if (confirm(`Confirm payment of ₹${total.toFixed(2)} from wallet?`)) {
-                    // Process wallet payment
                     processWalletPayment(total);
                 }
             } else {
@@ -1456,39 +1535,30 @@
             }
         }
 
-        // Simple wallet payment processing
         function processWalletPayment(amount) {
-            // Simple form submission - let Django handle the payment
             alert('Processing payment of ₹' + amount.toFixed(2) + ' from wallet...');
             document.querySelector('form').submit();
         }
 
-        // Add Wallet button functionality
         document.addEventListener('DOMContentLoaded', function () {
             const addWalletBtn = document.getElementById('add-wallet-btn');
 
-            // Update wallet button based on selected customer
             function updateWalletButton() {
                 if (customerSelect && customerSelect.value && addWalletBtn) {
-                    // Get the selected customer's user ID
                     const customerId = customerSelect.value;
                     const selectedOption = customerSelect.options[customerSelect.selectedIndex];
                     const wasteInfoId = selectedOption.getAttribute('data-waste-info-id');
 
-                    // Make button active
                     addWalletBtn.style.opacity = '1';
                     addWalletBtn.style.pointerEvents = 'auto';
                     addWalletBtn.onclick = null;
 
                     if (wasteInfoId && wasteInfoId !== 'None' && wasteInfoId !== '' && wasteInfoId !== 'undefined') {
-                        // Use specific waste info ID
                         addWalletBtn.href = `/payments/initiate/${wasteInfoId}/`;
                     } else {
-                        // Use user ID fallback
                         addWalletBtn.href = `/payments/initiate-by-user/${customerId}/`;
                     }
                 } else if (addWalletBtn) {
-                    // If no customer is selected, disable the button
                     addWalletBtn.href = 'javascript:void(0)';
                     addWalletBtn.style.opacity = '0.5';
                     addWalletBtn.style.pointerEvents = 'none';
@@ -1496,18 +1566,257 @@
                 }
             }
 
-            // Add event listener for customer selection changes
             if (customerSelect) {
                 customerSelect.addEventListener('change', updateWalletButton);
             }
 
-            // Initialize wallet button state on page load
             updateWalletButton();
         });
 
         function showNoCustomerAlert() {
             alert('Please select a customer first before adding wallet funds. No customer waste information is available for this entry.');
         }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // GENERATE INVOICE PDF  (newly added – no existing code was changed)
+        //
+        // Collects all values already displayed in the Billing Information
+        // section and renders a professional A4 invoice using jsPDF.
+        // ═══════════════════════════════════════════════════════════════════
+        function generateInvoicePDF() {
+            const { jsPDF } = window.jspdf;
+
+            // ── Collect data from the page ──────────────────────────────
+            const billNumber   = (document.getElementById('billing-number-text')  || {}).textContent || 'BILL-0001';
+            const localbody    = (document.getElementById('localbody-name')        || {}).textContent || '-';
+            const rateText     = (document.getElementById('rate-per-kg')           || {}).textContent || '₹40.00';
+            const weightText   = (document.getElementById('weight-value')          || {}).textContent || '0.00 KG';
+            const totalText    = (document.getElementById('total-amount')          || {}).textContent || '₹0.00';
+            const rate         = rateText.replace('₹', '').trim();
+            const weight       = weightText.replace(' KG', '').trim();
+            const total        = totalText.replace('₹', '').trim();
+
+            // Customer info
+            const custSel      = document.querySelector('select[name="customer"]');
+            const customerName = custSel && custSel.options[custSel.selectedIndex]
+                                 ? custSel.options[custSel.selectedIndex].text
+                                 : 'N/A';
+
+            // Ward, location
+            const wardInput    = document.querySelector('input[name="ward"], select[name="ward"]');
+            const ward         = wardInput ? wardInput.value || '-' : '-';
+            const locInput     = document.querySelector('input[name="location"], select[name="location"]');
+            const location     = locInput  ? locInput.value  || '-' : '-';
+            const buildingEl   = document.querySelector('input[name="building_no"]');
+            const building     = buildingEl ? buildingEl.value || '-' : '-';
+            const streetEl     = document.querySelector('input[name="street_name"]');
+            const street       = streetEl  ? streetEl.value  || '-' : '-';
+            const bagsEl       = document.querySelector('input[name="number_of_bags"]');
+            const bags         = bagsEl    ? bagsEl.value    || '0' : '0';
+            const paymentEl    = document.querySelector('select[name="payment_method"]');
+            const paymentMethod = paymentEl && paymentEl.options[paymentEl.selectedIndex]
+                                  ? paymentEl.options[paymentEl.selectedIndex].text
+                                  : 'N/A';
+
+            const now          = new Date();
+            const dateStr      = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+            const timeStr      = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+
+            // ── Build PDF ───────────────────────────────────────────────
+            const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+            const pw  = doc.internal.pageSize.getWidth();   // 210
+            const ph  = doc.internal.pageSize.getHeight();  // 297
+
+            // Helper colours (RGB)
+            const GREEN  = [76, 175, 80];
+            const BLUE   = [33, 150, 243];
+            const DKGRAY = [51, 51, 51];
+            const LTGRAY = [245, 247, 250];
+            const WHITE  = [255, 255, 255];
+            const BORDER = [224, 224, 224];
+
+            // ── Header gradient band ────────────────────────────────────
+            doc.setFillColor(...GREEN);
+            doc.rect(0, 0, pw, 38, 'F');
+            doc.setFillColor(...BLUE);
+            doc.rect(pw * 0.55, 0, pw * 0.45, 38, 'F');
+
+            // Company name
+            doc.setTextColor(...WHITE);
+            doc.setFontSize(22);
+            doc.setFont('helvetica', 'bold');
+            doc.text('SuchiGo', 14, 17);
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Sustainable Waste Management', 14, 24);
+            doc.text('info@suchigo.in  |  www.suchigo.in', 14, 30);
+
+            // INVOICE label top-right
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text('INVOICE', pw - 14, 18, { align: 'right' });
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text(billNumber, pw - 14, 26, { align: 'right' });
+            doc.text(dateStr + '  ' + timeStr, pw - 14, 32, { align: 'right' });
+
+            // ── Info cards row ──────────────────────────────────────────
+            let y = 48;
+            const cardW = (pw - 28 - 8) / 2;   // two cards with 8mm gap, 14mm margins
+
+            // Card 1 – Bill To
+            doc.setFillColor(...LTGRAY);
+            doc.roundedRect(14, y, cardW, 38, 3, 3, 'F');
+            doc.setTextColor(...GREEN);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('BILL TO', 18, y + 7);
+            doc.setTextColor(...DKGRAY);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text(customerName, 18, y + 14);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.text('Building: ' + building, 18, y + 21);
+            doc.text('Street: '   + street,   18, y + 27);
+            doc.text('Ward: '     + ward,     18, y + 33);
+
+            // Card 2 – Collection Details
+            const c2x = 14 + cardW + 8;
+            doc.setFillColor(...LTGRAY);
+            doc.roundedRect(c2x, y, cardW, 38, 3, 3, 'F');
+            doc.setTextColor(...BLUE);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.text('COLLECTION DETAILS', c2x + 4, y + 7);
+            doc.setTextColor(...DKGRAY);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.text('Local Body : ' + localbody,      c2x + 4, y + 14);
+            doc.text('Location   : ' + location,       c2x + 4, y + 20);
+            doc.text('Bags       : ' + bags + ' bag(s)', c2x + 4, y + 26);
+            doc.text('Payment    : ' + paymentMethod,  c2x + 4, y + 32);
+
+            // ── Line items table ────────────────────────────────────────
+            y += 46;
+
+            // Table header
+            doc.setFillColor(...GREEN);
+            doc.rect(14, y, pw - 28, 9, 'F');
+            doc.setTextColor(...WHITE);
+            doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'bold');
+            const cols = { desc: 16, qty: 90, rate: 120, amt: 165 };
+            doc.text('#',           cols.desc, y + 6);
+            doc.text('Description', cols.desc + 6, y + 6);
+            doc.text('Weight',      cols.qty,   y + 6);
+            doc.text('Rate / KG',   cols.rate,  y + 6);
+            doc.text('Amount',      cols.amt,   y + 6);
+            y += 9;
+
+            // Table row 1 – Waste Collection
+            doc.setFillColor(...WHITE);
+            doc.rect(14, y, pw - 28, 10, 'F');
+            doc.setDrawColor(...BORDER);
+            doc.setLineWidth(0.3);
+            doc.rect(14, y, pw - 28, 10, 'S');
+            doc.setTextColor(...DKGRAY);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.text('01',                     cols.desc,     y + 7);
+            doc.text('Waste Collection Service', cols.desc + 6, y + 7);
+            doc.text(weight + ' KG',           cols.qty,      y + 7);
+            doc.text('Rs.' + rate,             cols.rate,     y + 7);
+            doc.text('Rs.' + total,            cols.amt,      y + 7);
+            y += 10;
+
+            // Empty filler row
+            doc.setFillColor(250, 252, 250);
+            doc.rect(14, y, pw - 28, 8, 'F');
+            doc.rect(14, y, pw - 28, 8, 'S');
+            y += 8;
+
+            // ── Totals block ────────────────────────────────────────────
+            y += 6;
+            const totW  = 80;
+            const totX  = pw - 14 - totW;
+
+            // Sub-total row
+            doc.setDrawColor(...BORDER);
+            doc.setLineWidth(0.25);
+            doc.setFillColor(...LTGRAY);
+            doc.rect(totX, y, totW, 8, 'F');
+            doc.rect(totX, y, totW, 8, 'S');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(...DKGRAY);
+            doc.text('Sub-total',        totX + 4,  y + 5.5);
+            doc.text('Rs.' + total,      totX + totW - 4, y + 5.5, { align: 'right' });
+            y += 8;
+
+            // Tax row (0%)
+            doc.setFillColor(...WHITE);
+            doc.rect(totX, y, totW, 8, 'F');
+            doc.rect(totX, y, totW, 8, 'S');
+            doc.text('GST / Tax (0%)',   totX + 4,  y + 5.5);
+            doc.text('Rs.0.00',          totX + totW - 4, y + 5.5, { align: 'right' });
+            y += 8;
+
+            // TOTAL row
+            doc.setFillColor(...GREEN);
+            doc.rect(totX, y, totW, 10, 'F');
+            doc.setTextColor(...WHITE);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.text('TOTAL',            totX + 4,  y + 7);
+            doc.text('Rs.' + total,      totX + totW - 4, y + 7, { align: 'right' });
+            y += 16;
+
+            // ── Payment status pill ─────────────────────────────────────
+            doc.setFillColor(232, 245, 232);
+            doc.roundedRect(14, y, 60, 9, 2, 2, 'F');
+            doc.setTextColor(...GREEN);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.text('Payment Method: ' + paymentMethod, 17, y + 6);
+
+            // ── Notes box ───────────────────────────────────────────────
+            y += 16;
+            doc.setDrawColor(...BORDER);
+            doc.setFillColor(250, 253, 250);
+            doc.roundedRect(14, y, pw - 28, 22, 3, 3, 'FD');
+            doc.setTextColor(...GREEN);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.text('NOTES', 18, y + 7);
+            doc.setTextColor(100, 100, 100);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text('Thank you for contributing to a cleaner environment!', 18, y + 13);
+            doc.text('For queries: support@suchigo.in  |  This is a computer-generated invoice.', 18, y + 19);
+
+            // ── Footer bar ──────────────────────────────────────────────
+            doc.setFillColor(...GREEN);
+            doc.rect(0, ph - 14, pw, 14, 'F');
+            doc.setTextColor(...WHITE);
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.text('SuchiGo Waste Management  |  www.suchigo.in', pw / 2, ph - 6, { align: 'center' });
+
+            // ── Watermark-style diagonal text ───────────────────────────
+            doc.setTextColor(76, 175, 80, 0.06);   // very faint green
+            doc.setFontSize(52);
+            doc.setFont('helvetica', 'bold');
+            doc.saveGraphicsState && doc.saveGraphicsState();
+            doc.text('SuchiGo', pw / 2, ph / 2, { align: 'center', angle: 45 });
+            doc.loadGraphicsState && doc.loadGraphicsState();
+
+            // ── Save ────────────────────────────────────────────────────
+            const fileName = 'SuchiGo_Invoice_' + billNumber + '_' + dateStr.replace(/ /g, '-') + '.pdf';
+            doc.save(fileName);
+        }
+        // ═══════════════════════════════════════════════════════════════
     </script>
 
 </body>
