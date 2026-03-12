@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Control - SuchiGo Admin</title>
+    {% csrf_token %}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --warning: #FF9800;
+            --purple: #9C27B0;
+            --gray: #666;
+            --light: #f8f9fa;
+            --dark: #333;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .navbar-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .navbar-links a {
+            text-decoration: none;
+            color: var(--gray);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .navbar-links a:hover,
+        .navbar-links a.active {
+            color: var(--primary);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .price-control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .price-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .price-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .price-card-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .price-card-header h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-card-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .price-card-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .input-group .input-prefix {
+            font-weight: 600;
+            color: var(--gray);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76,175,80,0.3);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33,150,243,0.3);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+        }
+
+        .price-history {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .price-history-header {
+            background: linear-gradient(135deg, var(--purple), var(--warning));
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .price-history-header h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .price-history-table th,
+        .price-history-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .price-history-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .price-history-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .price-control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .navbar-links {
+                display: none;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-left">
+            <img src="{% static 'images/logo.png.jpg' %}" alt="SuchiGo Logo" class="navbar-logo">
+            <div class="logo-text">SuchiGo</div>
+        </div>
+        <ul class="navbar-links">
+            <li><a href="{% url 'super_admin_dashboard:super_admin_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'super_admin_dashboard:price_control' %}" class="active">Price Control</a></li>
+            <li><a href="{% url 'super_admin_dashboard:view_collected_data' %}">Collected Data</a></li>
+            <li><a href="{% url 'authentication:logout' %}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>💰 Price Control</h1>
+            <p>Manage and control pricing for waste collection services</p>
+        </div>
+
+        <div class="alert alert-success" id="successAlert">
+            <i class="fas fa-check-circle"></i> Price updated successfully!
+        </div>
+
+        <div class="alert alert-error" id="errorAlert">
+            <i class="fas fa-exclamation-circle"></i> Error updating price. Please try again.
+        </div>
+
+    
+            <!-- Area Price Control (District + Local Body + Ward) -->
+            <div class="price-card">
+                <div class="price-card-header">
+                    <h3><i class="fas fa-coins"></i> Area Price Control</h3>
+                    <p>Set rate per KG for a specific ward</p>
+                </div>
+                <div class="price-card-body">
+                    <form id="areaPriceForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="areaDistrict">District</label>
+                            <select id="areaDistrict" name="district_id" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                                <option value="">-- Select District --</option>
+                                {% for district in districts %}
+                                <option value="{{ district.id }}">{{ district.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="areaLocalbody">Local Body</label>
+                            <select id="areaLocalbody" name="localbody_id" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                                <option value="">-- Select District first --</option>
+                                {% for lb in localbodies %}
+                                <option value="{{ lb.id }}" data-district="{{ lb.district_id }}">{{ lb.name }}{% if lb.body_type %} ({{ lb.get_body_type_display }}){% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="areaWard">Ward</label>
+                            <select id="areaWard" name="ward" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+                                <option value="">-- Select Local Body first --</option>
+                                {% for lb in localbodies %}
+                                    {% if 'kochi' in lb.name|lower %}
+                                        <option value="1" data-localbody="{{ lb.id }}" style="display:none;">Fort Kochi</option>
+                                        <option value="2" data-localbody="{{ lb.id }}" style="display:none;">Kalvathy</option>
+                                        <option value="3" data-localbody="{{ lb.id }}" style="display:none;">Earavely</option>
+                                        <option value="4" data-localbody="{{ lb.id }}" style="display:none;">Karippalam</option>
+                                        <option value="5" data-localbody="{{ lb.id }}" style="display:none;">Cheralayi</option>
+                                        <option value="6" data-localbody="{{ lb.id }}" style="display:none;">Mattanchery</option>
+                                        <option value="7" data-localbody="{{ lb.id }}" style="display:none;">Chakkamadam</option>
+                                        <option value="8" data-localbody="{{ lb.id }}" style="display:none;">Karuvelippady</option>
+                                        <option value="9" data-localbody="{{ lb.id }}" style="display:none;">Island North</option>
+                                        <option value="10" data-localbody="{{ lb.id }}" style="display:none;">Ravipuram</option>
+                                        <option value="11" data-localbody="{{ lb.id }}" style="display:none;">Ernakulam South</option>
+                                        <option value="12" data-localbody="{{ lb.id }}" style="display:none;">Gandhi Nagar</option>
+                                        <option value="13" data-localbody="{{ lb.id }}" style="display:none;">Kathrikadavu</option>
+                                        <option value="14" data-localbody="{{ lb.id }}" style="display:none;">Ernakulam Central</option>
+                                        <option value="15" data-localbody="{{ lb.id }}" style="display:none;">Ernakulam North</option>
+                                        <option value="16" data-localbody="{{ lb.id }}" style="display:none;">Kaloor South</option>
+                                        <option value="17" data-localbody="{{ lb.id }}" style="display:none;">Kaloor North</option>
+                                        <option value="18" data-localbody="{{ lb.id }}" style="display:none;">Thrikkanarvattom</option>
+                                        <option value="19" data-localbody="{{ lb.id }}" style="display:none;">Ayyappankavu</option>
+                                        <option value="20" data-localbody="{{ lb.id }}" style="display:none;">Pottakuzhy</option>
+                                        <option value="21" data-localbody="{{ lb.id }}" style="display:none;">Elamakkara South</option>
+                                        <option value="22" data-localbody="{{ lb.id }}" style="display:none;">Pachalam</option>
+                                        <option value="23" data-localbody="{{ lb.id }}" style="display:none;">Thattazham</option>
+                                        <option value="24" data-localbody="{{ lb.id }}" style="display:none;">Vaduthala West</option>
+                                        <option value="25" data-localbody="{{ lb.id }}" style="display:none;">Vaduthala East</option>
+                                        <option value="26" data-localbody="{{ lb.id }}" style="display:none;">Elamakkara North</option>
+                                        <option value="27" data-localbody="{{ lb.id }}" style="display:none;">Puthukkalavattam</option>
+                                        <option value="28" data-localbody="{{ lb.id }}" style="display:none;">Kunnumpuram</option>
+                                        <option value="29" data-localbody="{{ lb.id }}" style="display:none;">Ponekkara</option>
+                                        <option value="30" data-localbody="{{ lb.id }}" style="display:none;">Edappally</option>
+                                        <option value="31" data-localbody="{{ lb.id }}" style="display:none;">Changampuzha</option>
+                                        <option value="32" data-localbody="{{ lb.id }}" style="display:none;">Dhevankulangara</option>
+                                        <option value="33" data-localbody="{{ lb.id }}" style="display:none;">Palarivattom</option>
+                                        <option value="34" data-localbody="{{ lb.id }}" style="display:none;">Stadium</option>
+                                        <option value="35" data-localbody="{{ lb.id }}" style="display:none;">Karanakkodam</option>
+                                        <option value="36" data-localbody="{{ lb.id }}" style="display:none;">Puthiyaroad</option>
+                                        <option value="37" data-localbody="{{ lb.id }}" style="display:none;">Padivattam</option>
+                                        <option value="38" data-localbody="{{ lb.id }}" style="display:none;">Vennala</option>
+                                        <option value="39" data-localbody="{{ lb.id }}" style="display:none;">Chakkaraparambu</option>
+                                        <option value="40" data-localbody="{{ lb.id }}" style="display:none;">Chalikkavattam</option>
+                                        <option value="41" data-localbody="{{ lb.id }}" style="display:none;">Thammanam</option>
+                                        <option value="42" data-localbody="{{ lb.id }}" style="display:none;">Elamkulam</option>
+                                        <option value="43" data-localbody="{{ lb.id }}" style="display:none;">Girinagar</option>
+                                        <option value="44" data-localbody="{{ lb.id }}" style="display:none;">Ponnurunni</option>
+                                        <option value="45" data-localbody="{{ lb.id }}" style="display:none;">Ponnurunni East</option>
+                                        <option value="46" data-localbody="{{ lb.id }}" style="display:none;">Vyttila</option>
+                                        <option value="47" data-localbody="{{ lb.id }}" style="display:none;">Poonithura</option>
+                                        <option value="48" data-localbody="{{ lb.id }}" style="display:none;">Vyttila Janatha</option>
+                                        <option value="49" data-localbody="{{ lb.id }}" style="display:none;">Kadavanthra</option>
+                                        <option value="50" data-localbody="{{ lb.id }}" style="display:none;">Panampilly Nagar</option>
+                                        <option value="51" data-localbody="{{ lb.id }}" style="display:none;">Perumanoor</option>
+                                        <option value="52" data-localbody="{{ lb.id }}" style="display:none;">Konthuruthy</option>
+                                        <option value="53" data-localbody="{{ lb.id }}" style="display:none;">Thevara</option>
+                                        <option value="54" data-localbody="{{ lb.id }}" style="display:none;">Island South</option>
+                                        <option value="55" data-localbody="{{ lb.id }}" style="display:none;">Kadebhagam</option>
+                                        <option value="56" data-localbody="{{ lb.id }}" style="display:none;">Palluruthy East</option>
+                                        <option value="57" data-localbody="{{ lb.id }}" style="display:none;">Thazhuppu</option>
+                                        <option value="58" data-localbody="{{ lb.id }}" style="display:none;">Eadakochi North</option>
+                                        <option value="59" data-localbody="{{ lb.id }}" style="display:none;">Edakochi South</option>
+                                        <option value="60" data-localbody="{{ lb.id }}" style="display:none;">Perumbadappu</option>
+                                        <option value="61" data-localbody="{{ lb.id }}" style="display:none;">Konam</option>
+                                        <option value="62" data-localbody="{{ lb.id }}" style="display:none;">Palluruthy Kacheripady</option>
+                                        <option value="63" data-localbody="{{ lb.id }}" style="display:none;">Nambyapuram</option>
+                                        <option value="64" data-localbody="{{ lb.id }}" style="display:none;">Palluruthy</option>
+                                        <option value="65" data-localbody="{{ lb.id }}" style="display:none;">Pullardesam</option>
+                                        <option value="66" data-localbody="{{ lb.id }}" style="display:none;">Tharebhagam</option>
+                                        <option value="67" data-localbody="{{ lb.id }}" style="display:none;">Thoppumpady</option>
+                                        <option value="68" data-localbody="{{ lb.id }}" style="display:none;">Mundamvely East</option>
+                                        <option value="69" data-localbody="{{ lb.id }}" style="display:none;">Mundamvely</option>
+                                        <option value="70" data-localbody="{{ lb.id }}" style="display:none;">Manassery</option>
+                                        <option value="71" data-localbody="{{ lb.id }}" style="display:none;">Moolamkuzhy</option>
+                                        <option value="72" data-localbody="{{ lb.id }}" style="display:none;">Chullickal</option>
+                                        <option value="73" data-localbody="{{ lb.id }}" style="display:none;">Nasrathu</option>
+                                        <option value="74" data-localbody="{{ lb.id }}" style="display:none;">Panayappilly</option>
+                                        <option value="75" data-localbody="{{ lb.id }}" style="display:none;">Amaravathy</option>
+                                        <option value="76" data-localbody="{{ lb.id }}" style="display:none;">Fortkochi Veli</option>
+                                    {% else %}
+                                        <option value="1" data-localbody="{{ lb.id }}" style="display:none;">Ward 1</option>
+                                        <option value="2" data-localbody="{{ lb.id }}" style="display:none;">Ward 2</option>
+                                        <option value="3" data-localbody="{{ lb.id }}" style="display:none;">Ward 3</option>
+                                        <option value="4" data-localbody="{{ lb.id }}" style="display:none;">Ward 4</option>
+                                        <option value="5" data-localbody="{{ lb.id }}" style="display:none;">Ward 5</option>
+                                        <option value="6" data-localbody="{{ lb.id }}" style="display:none;">Ward 6</option>
+                                        <option value="7" data-localbody="{{ lb.id }}" style="display:none;">Ward 7</option>
+                                        <option value="8" data-localbody="{{ lb.id }}" style="display:none;">Ward 8</option>
+                                        <option value="9" data-localbody="{{ lb.id }}" style="display:none;">Ward 9</option>
+                                        <option value="10" data-localbody="{{ lb.id }}" style="display:none;">Ward 10</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="areaPricePerKg">Price per KG (Area)</label>
+                            <div class="input-group">
+                                <span class="input-prefix">₹</span>
+                                <input type="number" id="areaPricePerKg" name="price_per_kg" step="0.01" min="0" required placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="resetAreaPriceForm()">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Area Price
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if price_controls %}
+                    <div style="margin-top: 1.5rem;">
+                        <h4 style="margin-bottom: 0.75rem; color: var(--dark);">Existing Area Prices</h4>
+                        <div style="overflow-x:auto; border: 1px solid #eee; border-radius: 10px;">
+                            <table class="price-history-table" style="margin: 0;">
+                                <thead>
+                                    <tr>
+                                        <th>District</th>
+                                        <th>Local Body</th>
+                                        <th>Ward</th>
+                                        <th>Price (₹/kg)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pc in price_controls %}
+                                    <tr>
+                                        <td>{{ pc.district.name|default:"—" }}</td>
+                                        <td>{{ pc.localbody.name|default:"—" }}</td>
+                                        <td>{{ pc.ward|default:"—" }}</td>
+                                        <td><strong>₹{{ pc.price_per_kg }}</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Price History -->
+        <div class="price-history">
+            <div class="price-history-header">
+                <h3><i class="fas fa-history"></i> Price History</h3>
+                <p>Recent changes to pricing structure</p>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="price-history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Old Price</th>
+                            <th>New Price</th>
+                            <th>Updated By</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="priceHistoryBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
+                                No price history available
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form handling
+        document.getElementById('wasteTypeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveWasteTypePrice();
+        });
+
+        document.getElementById('serviceFeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveServiceFees();
+        });
+
+        document.getElementById('locationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveLocationMultiplier();
+        });
+
+        document.getElementById('areaPriceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveAreaPrice();
+        });
+
+        // Area Price Control JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            const districtSelect = document.getElementById('areaDistrict');
+            const localbodySelect = document.getElementById('areaLocalbody');
+            const wardSelect = document.getElementById('areaWard');
+
+            // Store all original ward options before any manipulation
+            const originalWardOptions = Array.from(wardSelect.querySelectorAll('option[data-localbody]'));
+            console.log('Stored ward options:', originalWardOptions.length); // Debug
+
+            // Filter local bodies based on district selection
+            districtSelect.addEventListener('change', function() {
+                const selectedDistrict = this.value;
+                const options = localbodySelect.querySelectorAll('option');
+                
+                // Reset local body and ward selects
+                localbodySelect.innerHTML = '<option value="">-- Select Local Body --</option>';
+                wardSelect.innerHTML = '<option value="">-- Select Local Body first --</option>';
+                
+                if (selectedDistrict) {
+                    // Add filtered local bodies
+                    options.forEach(function(option) {
+                        if (option.value === '' || option.dataset.district === selectedDistrict) {
+                            localbodySelect.appendChild(option.cloneNode(true));
+                        }
+                    });
+                }
+            });
+
+            // Simple ward loading - use stored original options
+            localbodySelect.addEventListener('change', function() {
+                const selectedLocalbody = this.value;
+                console.log('Local body changed to:', selectedLocalbody); // Debug
+                
+                // Clear current ward options except default "-- Select Ward --"
+                wardSelect.innerHTML = '<option value="">-- Select Ward --</option>';
+                
+                if (selectedLocalbody) {
+                    let count = 0;
+                    // Find all hidden ward options for this localbody from stored options
+                    originalWardOptions.forEach(function(option) {
+                        console.log('Checking option:', option.dataset.localbody, 'vs', selectedLocalbody); // Debug
+                        if (option.dataset.localbody === selectedLocalbody) {
+                            // Clone and show the option
+                            const newOption = option.cloneNode(true);
+                            newOption.style.display = '';
+                            wardSelect.appendChild(newOption);
+                            count++;
+                        }
+                    });
+                    console.log('Added', count, 'ward options'); // Debug
+                }
+            });
+        });
+
+        function saveWasteTypePrice() {
+            const formData = new FormData(document.getElementById('wasteTypeForm'));
+            
+            fetch('{% url "super_admin_dashboard:save_waste_price" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    waste_type: formData.get('waste_type'),
+                    price_per_kg: formData.get('price_per_kg'),
+                    status: formData.get('status')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('successAlert');
+                    loadPriceHistory();
+                    resetWasteForm();
+                } else {
+                    showAlert('errorAlert');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('errorAlert');
+            });
+        }
+
+        function saveServiceFees() {
+            const formData = new FormData(document.getElementById('serviceFeeForm'));
+            
+            fetch('{% url "super_admin_dashboard:save_service_fees" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    base_fee: formData.get('base_fee'),
+                    fee_per_bag: formData.get('fee_per_bag'),
+                    min_charge: formData.get('min_charge')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('successAlert');
+                    loadPriceHistory();
+                    resetServiceForm();
+                } else {
+                    showAlert('errorAlert');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('errorAlert');
+            });
+        }
+
+        function saveLocationMultiplier() {
+            const formData = new FormData(document.getElementById('locationForm'));
+            const multiplierInput = document.getElementById('locationMultiplier');
+            
+            // Client-side validation before sending
+            const multiplier = parseFloat(formData.get('price_multiplier'));
+            if (multiplier > 500.0 || multiplier < 0.1 || isNaN(multiplier)) {
+                showAlert('errorAlert');
+                return;
+            }
+            
+            fetch('{% url "super_admin_dashboard:save_location_multiplier" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    district: formData.get('district'),
+                    localbody: formData.get('localbody'),
+                    price_multiplier: formData.get('price_multiplier')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('successAlert');
+                    loadPriceHistory();
+                    resetLocationForm();
+                } else {
+                    showAlert('errorAlert');
+                    // Show specific error message if available
+                    if (data.error) {
+                        const errorElement = document.getElementById('multiplierError');
+                        errorElement.textContent = data.error;
+                        errorElement.style.display = 'block';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('errorAlert');
+            });
+        }
+
+        function saveAreaPrice() {
+            const formData = new FormData(document.getElementById('areaPriceForm'));
+            fetch('{% url "super_admin_dashboard:save_area_price" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    district_id: formData.get('district_id'),
+                    localbody_id: formData.get('localbody_id'),
+                    ward: formData.get('ward'),
+                    price_per_kg: formData.get('price_per_kg'),
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('successAlert');
+                    loadPriceHistory();
+                    // Reload page to refresh "Existing Area Prices" table
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    showAlert('errorAlert');
+                }
+            })
+            .catch(() => showAlert('errorAlert'));
+        }
+
+        function resetAreaPriceForm() {
+            document.getElementById('areaDistrict').value = '';
+            document.getElementById('areaDistrict').dispatchEvent(new Event('change'));
+            document.getElementById('areaPricePerKg').value = '';
+        }
+
+        function resetWasteForm() {
+            document.getElementById('wasteType').value = '';
+            document.getElementById('wastePrice').value = '';
+            document.getElementById('wasteStatus').value = 'active';
+        }
+
+        function resetServiceForm() {
+            document.getElementById('baseFee').value = '';
+            document.getElementById('bagFee').value = '';
+            document.getElementById('minCharge').value = '';
+        }
+
+        function resetLocationForm() {
+            document.getElementById('district').value = '';
+            document.getElementById('localbody').value = '';
+            document.getElementById('locationMultiplier').value = '1.0';
+            document.getElementById('multiplierError').style.display = 'none';
+        }
+
+        function showAlert(alertId) {
+            const alert = document.getElementById(alertId);
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 3000);
+        }
+
+        function validateMultiplier(input) {
+            const value = parseFloat(input.value);
+            const errorElement = document.getElementById('multiplierError');
+            
+            if (value > 500.0 || value < 0.1 || isNaN(value)) {
+                errorElement.style.display = 'block';
+                input.setCustomValidity('Multiplier must be between 0.1 and 500.0');
+            } else {
+                errorElement.style.display = 'none';
+                input.setCustomValidity('');
+            }
+        }
+
+        function loadPriceHistory() {
+            fetch('{% url "super_admin_dashboard:load_price_history" %}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data.length > 0) {
+                        const tbody = document.getElementById('priceHistoryBody');
+                        tbody.innerHTML = '';
+                        
+                        data.data.forEach(item => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${item.date}</td>
+                                <td>${item.type}</td>
+                                <td>${item.category}</td>
+                                <td>${item.old_price}</td>
+                                <td>${item.new_price}</td>
+                                <td>${item.updated_by}</td>
+                                <td><span class="status-badge status-${item.status}">${item.status}</span></td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading price history:', error);
+                });
+        }
+
+        // Load price history on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPriceHistory();
+            
+            // Auto-populate waste price when waste type is selected
+            const wasteTypeSelect = document.getElementById('wasteType');
+            const wastePriceInput = document.getElementById('wastePrice');
+            const wasteStatusSelect = document.getElementById('wasteStatus');
+            
+            wasteTypeSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const price = selectedOption.getAttribute('data-price');
+                const status = selectedOption.getAttribute('data-status');
+                
+                if (price) {
+                    wastePriceInput.value = price;
+                } else {
+                    wastePriceInput.value = '';
+                }
+                
+                if (status) {
+                    wasteStatusSelect.value = status;
+                } else {
+                    wasteStatusSelect.value = 'active';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
