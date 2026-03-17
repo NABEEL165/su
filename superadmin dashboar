@@ -1524,7 +1524,7 @@
                     </thead>
                     <tbody>
                         {% for order in orders %}
-                        <tr class="recent-order-row" style="border-bottom: 1px solid #eee;" data-customer="{{ order.customer_name|lower }}" data-phone="{{ order.customer_phone|default:'' }}" data-waste-type="{{ order.waste_type|lower }}" data-localbody="{{ order.localbody|lower }}" data-ward="{{ order.ward|default:''|lower }}" data-status="{{ order.status|lower }}" data-date="{{ order.scheduled_date|date:'Y-m-d' }}" data-collector="{{ order.assigned_collector|default:''|lower }}">
+                        <tr class="recent-order-row" style="border-bottom: 1px solid #eee;" data-order-id="{{ order.id }}" data-customer="{{ order.customer_name|lower }}" data-phone="{{ order.customer_phone|default:'' }}" data-waste-type="{{ order.waste_type|lower }}" data-localbody="{{ order.localbody|lower }}" data-ward="{{ order.ward|default:''|lower }}" data-status="{{ order.status|lower }}" data-date="{{ order.scheduled_date|date:'Y-m-d' }}" data-collector="{{ order.assigned_collector|default:''|lower }}">
                             <td style="padding: 1rem;">
                                 <div style="font-weight: 800; color: #111;">{{ order.customer_name }}</div>
                                 <small style="display: inline-flex; align-items: center; gap: 6px; color: #666;">
@@ -2222,7 +2222,23 @@
                             if (data.success) {
                                 showMessage(`Order status updated to ${newStatus}!`, 'success');
                                 closeModal('statusModal');
-                                location.reload();
+                                
+                                // If status is completed, remove the order row automatically
+                                if (newStatus === 'completed') {
+                                    const orderRow = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                                    if (orderRow) {
+                                        orderRow.style.transition = 'opacity 0.5s, transform 0.5s';
+                                        orderRow.style.opacity = '0';
+                                        orderRow.style.transform = 'translateX(-20px)';
+                                        setTimeout(() => {
+                                            orderRow.remove();
+                                            showMessage('Completed order removed from recent orders!', 'success');
+                                        }, 500);
+                                    }
+                                } else {
+                                    // For other status changes, reload the page
+                                    location.reload();
+                                }
                             } else {
                                 showMessage('Error: ' + (data.error || 'Failed to update status'), 'error');
                             }
