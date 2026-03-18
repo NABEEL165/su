@@ -1,0 +1,180 @@
+{% extends 'customer_dashboard.html' %}
+
+{% block title %}Payment Options{% endblock %}
+
+{% block content %}
+
+<style>
+.payment-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+.payment-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.payment-header h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+.payment-summary {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+.payment-summary h3 {
+    margin-top: 0;
+    color: #2c3e50;
+}
+.payment-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.payment-method {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.payment-method:hover {
+    border-color: #007bff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.1);
+}
+.payment-method.selected {
+    border-color: #007bff;
+    background-color: rgba(0,123,255,0.05);
+}
+.payment-method i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #007bff;
+}
+.payment-method h4 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+}
+.payment-method p {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+.payment-actions {
+    text-align: center;
+    margin-top: 2rem;
+}
+.btn-pay {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-pay:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+}
+.btn-pay:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+@media (max-width: 768px) {
+    .payment-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    .payment-methods {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<div class="payment-container">
+    <div class="payment-header">
+        <h1>Payment for Waste Collection Service</h1>
+        <p>Please select your preferred payment method</p>
+    </div>
+
+    <div class="payment-summary">
+        <h3>Order Summary</h3>
+        <div class="summary-item">
+            <strong>Service:</strong> {{ waste_info.waste_type }} Collection<br>
+            <strong>Customer:</strong> {{ waste_info.full_name }}<br>
+            <strong>Address:</strong> {{ waste_info.pickup_address }}<br>
+            <strong>Number of Bags:</strong> {{ waste_info.number_of_bags }}<br>
+            <strong>Total Amount:</strong> ₹{{ total_amount }}<br>
+        </div>
+    </div>
+
+    <!-- ✅ Only ONE form tag with correct action -->
+    <form method="post" id="paymentForm" action="{% url 'payments:initiate_payment' waste_info.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="payment_method" id="paymentMethod" value="">
+
+        <div class="payment-methods">
+            <div class="payment-method" onclick="selectPaymentMethod('razorpay', this)">
+                <i class="fab fa-cc-visa"></i>
+                <h4>Razorpay</h4>
+                <p>Credit/Debit Cards, Net Banking, UPI</p>
+            </div>
+
+            <div class="payment-method" onclick="selectPaymentMethod('stripe', this)">
+                <i class="fab fa-cc-stripe"></i>
+                <h4>Stripe</h4>
+                <p>International Payment Processor</p>
+            </div>
+
+            <div class="payment-method" onclick="selectPaymentMethod('paypal', this)">
+                <i class="fab fa-cc-paypal"></i>
+                <h4>PayPal</h4>
+                <p>PayPal Account</p>
+            </div>
+
+            <div class="payment-method" onclick="selectPaymentMethod('cod', this)">
+                <i class="fas fa-money-bill-wave"></i>
+                <h4>Cash on Delivery</h4>
+                <p>Pay when service is delivered</p>
+            </div>
+        </div>
+
+        <div class="payment-actions">
+            <button type="submit" class="btn-pay" id="payButton" disabled>
+                Proceed to Pay ₹{{ total_amount }}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function selectPaymentMethod(method, el) {
+    // Remove selected class from all
+    document.querySelectorAll('.payment-method').forEach(e => e.classList.remove('selected'));
+
+    // Add selected to clicked
+    el.classList.add('selected');
+
+    // Set hidden input
+    document.getElementById('paymentMethod').value = method;
+
+    // Enable button
+    document.getElementById('payButton').disabled = false;
+}
+</script>
+
+{% endblock %}
