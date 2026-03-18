@@ -5,10 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuchiGo - Waste Collector Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>SuchiGo - {% block title %}Dashboard{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -17,377 +15,316 @@
         }
 
         body {
-            background: linear-gradient(135deg, #e8f8f2 0%, #e0f4f1 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
             overflow-x: hidden;
         }
 
-        /* Navbar Styles */
+        /* Navbar */
         .navbar {
-            background: linear-gradient(135deg, #2e8b57 0%, #1c6d42 100%);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            padding: 0.8rem 1rem;
             position: fixed;
             top: 0;
-            width: 100%;
-            z-index: 1030;
-        }
-
-        .navbar-brand {
-            color: white !important;
-            font-weight: 700;
-            font-size: 1.6rem;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            text-decoration: none;
-        }
-
-        .logo-container {
-            position: relative;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            overflow: hidden;
-            background: white;
-            padding: 2px;
-        }
-
-        .logo-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 10px;
-        }
-
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1;
-        }
-
-        .brand-name {
-            font-size: 1.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: -2px;
-        }
-
-        .brand-tagline {
-            font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 400;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .navbar-search {
-            flex: 1;
-            max-width: 400px;
-            margin: 0 2rem;
-        }
-
-        .search-container {
-            position: relative;
-        }
-
-        .search-input {
-            background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, #4CAF50 0%, #2196F3 100%);
             color: white;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .search-input:focus {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: #4ade80;
-            box-shadow: 0 0 0 0.2rem rgba(74, 222, 128, 0.25);
-            outline: none;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.8rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .navbar-nav {
             display: flex;
-            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .navbar-left {
+            display: flex;
             align-items: center;
             gap: 1rem;
         }
 
-        .nav-item {
-            position: relative;
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background 0.3s ease;
         }
 
-        .nav-icon-btn {
+        .menu-toggle:hover {
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
             color: white;
-            width: 40px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .logo img {
+            height: 50px;
+            width: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #27ae60;
+        }
+
+        .navbar-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 0 2rem;
+        }
+
+        /* Waste Guidelines Styles */
+        .guideline-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .guideline-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .guideline-section h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .guideline-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .guideline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .guideline-icon {
+            font-size: 1.2rem;
+            min-width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-            position: relative;
-            cursor: pointer;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .nav-icon-btn:hover {
+        .guideline-content h5 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .guideline-content p {
+            color: #666;
+            margin-bottom: 0;
+            line-height: 1.5;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-bell {
+            position: relative;
             background: rgba(255, 255, 255, 0.2);
-            border-color: #4ade80;
-            transform: translateY(-2px);
+            border: none;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-bell:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
         }
 
         .notification-badge {
             position: absolute;
             top: -5px;
             right: -5px;
-            background: #ef4444;
+            background: #ff4444;
             color: white;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             font-size: 0.7rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
-        .profile-dropdown {
-            position: relative;
-        }
-
-        .profile-btn {
+        .user-profile:hover {
             background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+        }
+
+        .user-avatar {
             width: 40px;
             height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
-        }
-
-        .profile-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: #4ade80;
-        }
-
-        .dropdown-menu {
-            background: white;
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-top: 0.5rem;
-            min-width: 200px;
-        }
-
-        .dropdown-item {
-            padding: 0.8rem 1.2rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .dropdown-item:hover {
-            background: linear-gradient(135deg, #e8f8f2 0%, #e0f4f1 100%);
-            color: #2e8b57;
-        }
-
-        /* Sidebar Styles */
-        .sidebar {
-            background: linear-gradient(180deg, #ffffff 0%, #f8fffe 100%);
-            width: 280px;
-            height: calc(100vh - 70px);
-            position: fixed;
-            top: 70px;
-            left: 0;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-            z-index: 1025;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            overflow-y: auto;
-        }
-
-        .sidebar.active {
-            transform: translateX(0);
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            background: linear-gradient(135deg, #2e8b57 0%, #22d3ee 100%);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20px;
-            width: 100px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50px;
-            transform: rotate(45deg);
-        }
-
-        .sidebar-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0;
+            text-decoration: none;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .sidebar-menu {
-            padding: 1rem 0;
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
-        .menu-section {
-            margin-bottom: 1.5rem;
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            width: 280px;
+            height: calc(100vh - 70px);
+            background: white;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 999;
         }
 
-        .menu-section-title {
-            padding: 0.5rem 1.5rem;
-            font-size: 0.8rem;
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .sidebar-title {
+            font-size: 1.1rem;
             font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #2c3e50;
             margin-bottom: 0.5rem;
         }
 
-        .menu-item {
+        .sidebar-subtitle {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-section-title {
+            padding: 0 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            padding: 0.8rem 1.5rem;
-            color: #333;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: #2c3e50;
             text-decoration: none;
             transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-            position: relative;
+            border-left: 3px solid transparent;
         }
 
-        .menu-item:hover,
-        .menu-item.active {
-            background: linear-gradient(135deg, #e8f8f2 0%, #e0f4f1 100%);
-            color: #2e8b57;
-            border-left-color: #4ade80;
-            transform: translateX(5px);
+        .nav-item:hover,
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(76, 175, 80, 0.1), transparent);
+            border-left-color: #4CAF50;
+            color: #4CAF50;
         }
 
-        .menu-item i {
+        .nav-icon {
+            font-size: 1.2rem;
             width: 20px;
             text-align: center;
-            font-size: 1.1rem;
-        }
-
-        .menu-badge {
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 0.2rem 0.6rem;
-            font-size: 0.7rem;
-            margin-left: auto;
-        }
-
-        .logout-item {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white !important;
-            margin: 1rem;
-            border-radius: 8px;
-            border-left: none !important;
-            text-align: center;
-            font-weight: 600;
-            position: absolute;
-            bottom: 0;
-            width: 86%;
-        }
-
-        .logout-item:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            color: white !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-        }
-
-        .navbar-nav .dropdown-menu {
-            position: absolute;
         }
 
         /* Main Content */
         .main-content {
-            margin-left: 0;
+            margin-left: 280px;
             margin-top: 70px;
-            padding: 2rem;
-            transition: margin-left 0.3s ease;
+            padding: 1.5rem;
             min-height: calc(100vh - 70px);
         }
 
-        .main-content.sidebar-open {
-            margin-left: 280px;
-        }
-
-        .sidebar-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 8px;
-            padding: 0.5rem 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-right: 1rem;
-        }
-
-        .sidebar-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: #4ade80;
-        }
-
-        /* Welcome Section */
         .welcome-section {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
-            border-radius: 20px;
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            color: white;
+            border-radius: 16px;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             position: relative;
             overflow: hidden;
         }
@@ -395,243 +332,311 @@
         .welcome-section::before {
             content: '';
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 211, 238, 0.1));
-            border-radius: 50%;
-            transform: translate(50%, -50%);
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+            }
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 1;
         }
 
         .welcome-title {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
-            color: #2e8b57;
             margin-bottom: 0.5rem;
-            position: relative;
-            z-index: 1;
         }
 
         .welcome-subtitle {
             font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 0;
-            position: relative;
-            z-index: 1;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
         }
 
-        /* Statistics Cards */
-        .stats-section {
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            border-left: 5px solid;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 211, 238, 0.1));
-            border-radius: 0 0 0 50px;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-card.total {
-            border-left-color: #4ade80;
-        }
-
-        .stat-card.today {
-            border-left-color: #22d3ee;
-        }
-
-        .stat-card.weight {
-            border-left-color: #2e8b57;
-        }
-
-        .stat-card.revenue {
-            border-left-color: #10b981;
-        }
-
-        .stat-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #2e8b57;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: #666;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Quick Actions */
-        .quick-actions {
-            margin-bottom: 2rem;
-        }
-
-        .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2e8b57;
-            margin-bottom: 1rem;
+        .status-badges {
             display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        .action-card {
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            max-width: 80%;
+            margin: auto;
+        }
+
+        .card {
             background: white;
-            border-radius: 15px;
+            border-radius: 16px;
             padding: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            border-left: 5px solid;
-            position: relative;
-            overflow: hidden;
-            display: block;
-            height: 100%;
-            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .action-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, rgba(74, 222, 128, 0.1), rgba(34, 211, 238, 0.1));
-            border-radius: 0 0 0 50px;
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
 
-        .action-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
         }
 
-        .action-card.add {
-            border-left-color: #4ade80;
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
 
-        .action-card.view {
-            border-left-color: #22d3ee;
+        .icon-green {
+            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+            color: #4CAF50;
         }
 
-        .action-card.assigned {
-            border-left-color: #2e8b57;
+        .icon-blue {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: #2196F3;
         }
 
-        .action-card.orders {
-            border-left-color: #10b981;
+        .icon-orange {
+            background: linear-gradient(135deg, #fff3e0, #ffcc02);
+            color: #ff9800;
         }
 
-        .action-card.reports {
-            border-left-color: #f59e0b;
+        .icon-purple {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+            color: #9c27b0;
         }
 
-        .action-card.analytics {
-            border-left-color: #8b5cf6;
-        }
-
-        .action-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .action-title {
+        .card-title {
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #2e8b57;
+            color: #2c3e50;
         }
 
-        .action-description {
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        /* Table Container */
-        .table-container {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .table-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #4ade80, #22d3ee);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
             transition: all 0.3s ease;
+            margin: 0.25rem;
+            text-align: center;
         }
 
-        .btn-success:hover {
-            background: linear-gradient(135deg, #2e8b57 0%, #0891b2 100%);
-            transform: translateY(-1px);
-        }
-
-        .btn-outline-success {
-            border-color: #4ade80;
-            color: #4ade80;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .btn-outline-success:hover {
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
-            border-color: #4ade80;
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
             color: white;
-            transform: translateY(-1px);
         }
 
-        /* Overlay */
+        .btn-secondary {
+            background: linear-gradient(135deg, #2196F3 0%, #1976d2 100%);
+            color: white;
+        }
+
+        .btn-tertiary {
+            background: linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .chat-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 350px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+            margin-top: 0.5rem;
+        }
+
+        .notification-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-time {
+            font-size: 0.7rem;
+            color: #999;
+        }
+
+        /* User Dropdown */
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 250px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+            margin-top: 0.5rem;
+        }
+
+        .user-dropdown-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            text-align: center;
+        }
+
+        .user-dropdown-menu {
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: #2c3e50;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        /* Sidebar overlay for mobile */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -639,428 +644,623 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 1020;
+            z-index: 998;
+            display: none;
             opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .sidebar-overlay.active {
+            display: block;
             opacity: 1;
-            visibility: visible;
         }
 
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            py: 5;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .empty-state::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #4ade80, #22d3ee);
-        }
-
-        .empty-icon {
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        /* Analytics Section */
-        .analytics-section {
-            margin-bottom: 2rem;
-        }
-
-        .analytics-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .analytics-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #4ade80, #22d3ee);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, #f8fffe 0%, #ffffff 100%);
-            padding: 1.2rem 1.5rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        /* Enhanced card layouts */
+        .card-content {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2e8b57;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .card-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-select-sm {
-            font-size: 0.85rem;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            border: 1px solid #e0e0e0;
-            background: white;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .metric-card {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 1rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
-        .metric-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: linear-gradient(180deg, #4ade80, #22d3ee);
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            text-align: center;
         }
 
-        .metric-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        .stat-item {
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: #f8f9fa;
         }
 
-        .metric-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .activity-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+        }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             flex-shrink: 0;
         }
 
-        .metric-content {
+        .activity-content {
             flex: 1;
         }
 
-        .metric-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2e8b57;
-            margin-bottom: 0.3rem;
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
         }
 
-        .metric-label {
-            font-size: 0.9rem;
+        .activity-time {
+            font-size: 0.8rem;
             color: #666;
-            margin-bottom: 0.5rem;
         }
 
-        .metric-change {
-            font-size: 0.85rem;
-            font-weight: 600;
+        /* Button groups */
+        .btn-group {
             display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            /*background: linear-gradient(135deg, #4CAF50, #2196F3);*/
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .metric-change.positive {
-            color: #10b981;
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
 
-        .metric-change.negative {
-            color: #ef4444;
+        .action-button.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 2px solid rgba(108, 117, 125, 0.2);
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 992px) {
-            .navbar-search {
-                display: none;
+        .action-button.secondary:hover {
+            background: rgba(108, 117, 125, 0.15);
+            border-color: rgba(108, 117, 125, 0.3);
+        }
+
+        .tagline {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .heading {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .navbar-center {
+                padding: 0 1rem;
             }
 
-            .main-content.sidebar-open {
-                margin-left: 0;
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1rem;
             }
 
             .main-content {
-                padding: 1.5rem;
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
             }
 
-            .brand-name {
+            .navbar {
+                padding: 0 0.5rem;
+            }
+
+            .navbar-left {
+                gap: 0.5rem;
+                flex: 0 0 auto;
+            }
+
+            .navbar-center {
+                flex: 1;
+                padding: 0 0.5rem;
+            }
+
+            .navbar-right {
+                gap: 0.5rem;
+                flex: 0 0 auto;
+            }
+
+            .logo {
                 font-size: 1.4rem;
             }
 
-            .brand-tagline {
-                font-size: 0.6rem;
+            .logo img {
+                height: 40px;
+                width: 40px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+            .logout-btn {
+                display: none;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem 0.5rem;
+            }
+
+            .welcome-section {
+                padding: 1.5rem;
             }
 
             .welcome-title {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
             }
 
             .welcome-subtitle {
                 font-size: 1rem;
             }
 
-            .welcome-section {
-                padding: 1.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .navbar-nav {
-                gap: 0.8rem;
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
 
-            .nav-icon-btn {
-                width: 38px;
-                height: 38px;
-            }
-
-            .main-content {
+            .card {
                 padding: 1rem;
             }
 
-            .stat-card {
-                padding: 1.2rem;
-                margin-bottom: 0.8rem;
-            }
-
-            .stat-number {
-                font-size: 1.4rem;
-            }
-
-            .stat-icon {
-                font-size: 2rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .action-card {
-                padding: 1rem;
-                margin-bottom: 0.8rem;
-                min-height: 140px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .action-icon {
-                font-size: 1.8rem;
-                margin-bottom: 0.6rem;
-            }
-
-            .action-title {
-                font-size: 0.9rem;
-                margin-bottom: 0.2rem;
-            }
-
-            .action-description {
-                font-size: 0.75rem;
-                display: none;
-            }
-
-            .logo-container {
-                width: 40px;
-                height: 40px;
-            }
-
-            .welcome-title {
-                font-size: 1.5rem;
-                text-align: center;
-            }
-
-            .welcome-subtitle {
-                font-size: 0.9rem;
-                text-align: center;
-            }
-
-            .welcome-section {
-                padding: 1.5rem 1rem;
-                text-align: center;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .brand-text {
-                display: none;
-            }
-
-            .welcome-title {
-                font-size: 1.4rem;
-            }
-
-            .welcome-subtitle {
-                font-size: 0.85rem;
-            }
-
-            .section-title {
-                font-size: 1.1rem;
-            }
-
-            .main-content {
-                padding: 0.8rem;
-            }
-
-            .welcome-section {
-                margin-bottom: 1.5rem;
-                border-radius: 15px;
-            }
-
-            .stats-section {
-                margin-bottom: 1rem;
-            }
-
-            .quick-actions {
-                margin-bottom: 1.5rem;
-            }
-
-            .table-container {
-                padding: 1rem;
-                border-radius: 12px;
-            }
-
-            .table th,
-            .table td {
+            .btn {
+                padding: 0.6rem 1rem;
                 font-size: 0.8rem;
-                padding: 0.6rem 0.4rem;
             }
 
-            .avatar-circle {
-                width: 30px !important;
-                height: 30px !important;
-                font-size: 0.8rem !important;
+            .chat-widget {
+                bottom: 1rem;
+                right: 1rem;
             }
-        }
 
-        /* Support for very small devices */
-        @media (max-width: 380px) {
-            .stat-number {
+            .chat-toggle {
+                width: 50px;
+                height: 50px;
                 font-size: 1.2rem;
             }
 
-            .stat-label {
-                font-size: 0.7rem;
+            .notification-dropdown {
+                width: calc(100vw - 2rem);
+                right: -140px;
             }
 
-            .action-title {
+            .user-dropdown {
+                width: calc(100vw - 2rem);
+                right: -100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                height: 60px;
+                padding: 0 0.25rem;
+            }
+
+            .navbar-center {
+                padding: 0 0.25rem;
+            }
+
+            .sidebar {
+                top: 60px;
+                height: calc(100vh - 60px);
+            }
+
+            .main-content {
+                margin-top: 60px;
+                padding: 0.5rem 0.25rem;
+            }
+
+            .welcome-section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .welcome-title {
+                font-size: 1.3rem;
+            }
+
+            .welcome-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .status-badges {
+                gap: 0.5rem;
+            }
+
+            .status-badge {
+                padding: 0.4rem 0.8rem;
                 font-size: 0.8rem;
+            }
+
+            .card {
+                padding: 0.75rem;
+                border-radius: 12px;
+            }
+
+            .card-header {
+                margin-bottom: 1rem;
+            }
+
+            .card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.75rem;
+                margin: 0.1rem;
+            }
+
+            .notification-dropdown {
+                right: -180px;
+                width: calc(100vw - 1rem);
+            }
+
+            .user-dropdown {
+                right: -150px;
+                width: calc(100vw - 1rem);
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-group .btn {
+                width: 100%;
+            }
+        }
+
+
+        /* Scene Container */
+        .animation-scene {
+            position: relative;
+            width: 150%;
+            height: 200px;
+            background: #a0d8ef;
+            /* Sky Blue */
+            overflow: hidden;
+        }
+
+        /* Moving Road */
+        .road-surface {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background: #333;
+        }
+
+        .road-lines {
+            width: 200%;
+            height: 4px;
+            border-top: 2px dashed rgba(255, 255, 255, 0.5);
+            position: absolute;
+            top: 50%;
+            animation: roadMove 1s linear infinite;
+        }
+
+        /* Truck Styling */
+        .truck-wrap {
+            position: absolute;
+            bottom: 15px;
+            left: 10%;
+            width: 180px;
+            height: 80px;
+            z-index: 10;
+            animation: truckShake 0.15s infinite alternate;
+        }
+
+        .truck-cabin {
+            position: absolute;
+            right: 0;
+            bottom: 20px;
+            width: 50px;
+            height: 50px;
+            background: #2e7d32;
+            /* Deep Green */
+            border-radius: 5px 15px 5px 5px;
+        }
+
+        .window {
+            position: absolute;
+            top: 8px;
+            right: 5px;
+            width: 25px;
+            height: 20px;
+            background: #e1f5fe;
+            border-radius: 2px 8px 2px 2px;
+        }
+
+        .light {
+            position: absolute;
+            bottom: 10px;
+            right: -2px;
+            width: 8px;
+            height: 5px;
+            background: #ffeb3b;
+            box-shadow: 5px 0 10px #ffeb3b;
+        }
+
+        .truck-container {
+            position: absolute;
+            left: 0;
+            bottom: 20px;
+            width: 125px;
+            height: 65px;
+            background: #388e3c;
+            border-radius: 5px;
+            border-right: 3px solid #1b5e20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* Detailed Rotating Wheels */
+        .wheel {
+            position: absolute;
+            bottom: 0;
+            width: 32px;
+            height: 32px;
+            background: #111;
+            border-radius: 50%;
+            border: 3px solid #222;
+            animation: rotateWheel 0.5s linear infinite;
+        }
+
+        .rim {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 2px;
+            background: #666;
+            transform: translate(-50%, -50%);
+        }
+
+        .rim::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: #666;
+            transform: rotate(90deg);
+        }
+
+        .wheel-1 {
+            left: 15px;
+        }
+
+        .wheel-2 {
+            left: 55px;
+        }
+
+        .wheel-3 {
+            right: 10px;
+        }
+
+        /* Navigation Styling */
+        .nav-holder {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 5px;
+            background: #fff;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: #777;
+            text-align: center;
+            font-size: 12px;
+            flex: 1;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .nav-item.active {
+            color: #2e7d32;
+        }
+
+        /* Keyframes */
+        @keyframes roadMove {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-60px);
+            }
+        }
+
+        @keyframes rotateWheel {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes truckShake {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-2px);
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="container-fluid">
-            <div class="d-flex align-items-center">
-                <button class="sidebar-toggle" onclick="toggleSidebar()">
-                    <i class="fas fa-bars"></i>
+        <div class="navbar-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a href="{% url 'customer:customer_dashboard' %}" class="logo">
+                <img src="{% static 'images/logo.png.jpg' %}" alt="SuchiGo Logo">
+                <div class="heading">
+                    <span>SuchiGo</span>
+                    <span class="tagline">Schedule. Collect. Sustain</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="navbar-center">
+            <!-- Search bar removed -->
+        </div>
+
+        <div class="navbar-right">
+            <!-- Notifications -->
+            <div style="position: relative;">
+                <button class="notification-bell" onclick="toggleNotifications()">
+                    <i class="fas fa-bell"></i>
+                    {% if notifications %}
+                    <span class="notification-badge">{{ notifications|length }}</span>
+                    {% endif %}
                 </button>
-                <a class="navbar-brand" href="#">
-                    <div class="logo-container">
-                        <img src="{% static 'images/logo.png.jpg' %}" alt="SuchiGo Logo" class="logo-image">
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">Notifications</div>
+                    <div class="notification-list">
+                        {% if notifications %}
+                            {% for n in notifications %}
+                            <div class="notification-item">
+                                <div class="notification-icon
+                                    {% if n.notification_type == 'pickup_completed' %}icon-green{% elif n.notification_type == 'payment_due' %}icon-orange{% else %}icon-blue{% endif %}">
+                                    <i class="fas fa-{{ n.icon|default:'bell' }}"></i>
+                                </div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        {{ n.title }}
+                                    </div>
+                                    <div class="notification-text">
+                                        {{ n.message }}
+                                    </div>
+                                    <div class="notification-time">
+                                        {{ n.created_at|timesince }} ago
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="notification-item">
+                                <div class="notification-content">
+                                    <div class="notification-text">
+                                        No notifications yet. Completed pickups and important updates will appear here.
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
-                    <div class="brand-text">
-                        <span class="brand-name">SuchiGo</span>
-                        <span class="brand-tagline">Schedule. Collect. Sustain</span>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Search Bar -->
-            <div class="navbar-search d-none d-lg-block">
-                <div class="search-container">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" placeholder="Search collections, customers..."
-                        id="globalSearch">
                 </div>
             </div>
 
-            <!-- Right side nav items -->
-            <div class="navbar-nav">
-                <!-- Notifications -->
-                <!--<div class="nav-item">-->
-                <!--    <div class="nav-icon-btn" onclick="toggleNotifications()" data-bs-toggle="tooltip"-->
-                <!--        title="Notifications">-->
-                <!--        <i class="fas fa-bell"></i>-->
-                <!--        <span class="notification-badge">3</span>-->
-                <!--    </div>-->
+            <!-- User Profile -->
+            <div style="position: relative;">
+                <div class="user-profile" onclick="toggleUserDropdown()">
+                    <div class="user-avatar">{{ request.user.first_name.0|default:request.user.username.0 }}{{ request.user.last_name.0|default:request.user.username.1 }}</div>
+                    <div class="user-info">
+                        <div class="user-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+                        <div class="user-email">{{ request.user.email }}</div>
+                    </div>
                 </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-dropdown-header">
+                        <div class="user-avatar" style="margin: 0 auto 0.5rem;">{{ request.user.first_name.0|default:request.user.username.0 }}{{ request.user.last_name.0|default:request.user.username.1 }}</div>
+                        <div style="font-weight: 600;">{{ request.user.first_name }} {{ request.user.last_name }}</div>
 
-                <!-- Profile Dropdown -->
-                <div class="nav-item profile-dropdown">
-                    <div class="dropdown">
-                        <div class="profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-user-circle"></i>
-                                    My Profile
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-cog"></i>
-                                    Settings
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="fas fa-question-circle"></i>
-                                    Help & Support
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'authentication:logout' %}">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    Logout
-                                </a>
-                            </li>
-                        </ul>
+                    </div>
+                    <div class="user-dropdown-menu">
+                        <a href="#" class="dropdown-item"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="#" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" class="dropdown-item"><i class="fas fa-map-marker-alt"></i> Manage Addresses</a>
+                        <a href="{% url 'authentication:logout' %}" class="dropdown-item" style="color: #f44336;"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </div>
             </div>
@@ -1068,1138 +1268,403 @@
     </nav>
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h5 class="sidebar-title">
-                <i class="fas fa-tachometer-alt"></i> Dashboard Menu
-            </h5>
+            <div class="sidebar-title">Dashboard</div>
+            <div class="sidebar-subtitle">Manage your waste collection</div>
         </div>
-
-        <div class="sidebar-menu">
-            <!-- Main Navigation -->
-            <div class="menu-section">
-                <div class="menu-section-title">Main</div>
-                <a href="{% url 'waste_collector:waste_collector_dashboard' %}" class="menu-item active">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <a href="{% url 'customer:customer_dashboard' %}" class="nav-item active">
+                    <span class="nav-icon"><i class="fas fa-home"></i></span>
+                    Dashboard
                 </a>
-                <a href="{% url 'waste_collector:waste_collect_list' %}" class="menu-item">
-                    <i class="fas fa-list"></i>
-                    <span>View Records</span>
+                <a href="{% url 'customer:waste_profile_create' %}" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-box"></i></span>
+                    Book Pickup
                 </a>
-
-                <a href="{% url 'waste_collector:assigned_customers' %}" class="menu-item">
-                    <i class="fas fa-tasks"></i>
-                    <span>Assigned Waste</span>
-                    <span class="menu-badge">5</span>
+                <a href="{% url 'customer:waste_profile_list' %}" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-list"></i></span>
+                    Waste Pickup Records
                 </a>
-                <a href="{% url 'waste_collector:localbody_orders' %}" class="menu-item">
-                    <i class="fas fa-building"></i>
-                    <span>Local Body Orders</span>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-exclamation-circle"></i></span>
+                    Report Issue
+                </a>
+                <!--<a href="#" class="nav-item">-->
+                <!--    <span class="nav-icon"><i class="fas fa-credit-card"></i></span>-->
+                <!--    Billing-->
+                <!--</a>-->
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Services</div>
+                <a href="#" class="nav-item" onclick="showWasteGuidelines(); return false;">
+                    <span class="nav-icon"><i class="fas fa-recycle"></i></span>
+                    Waste Guidelines
                 </a>
             </div>
-
-            <!-- Management -->
-            <div class="menu-section">
-                <div class="menu-section-title">Management</div>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Waste Pickup Record (Previous & upcoming)</span>
+            <div class="nav-section">
+                <div class="nav-section-title">Support</div>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-question-circle"></i></span>
+                    Help & Support
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fas fa-cog"></i></span>
+                    Settings
+                </a>
+                <a href="{% url 'authentication:logout' %}" class="nav-item"
+                    style="position: absolute; bottom: 0; color: #f44336; margin-top: 1rem; border-top: 1px solid #e0e0e0; padding-top: 1rem;">
+                    <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+                    Logout
                 </a>
             </div>
-
-            <!-- Reports & Analytics -->
-            <div class="menu-section">
-                <div class="menu-section-title">Reports & Analytics</div>
-                <a href="{% url 'waste_collector:billing_dashboard' %}" class="menu-item">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Analytics</span>
-                </a>
-                <a href="javascript:void(0)" onclick="generateReports()" class="menu-item">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Reports</span>
-                </a>
-                <a href="javascript:void(0)" onclick="generateReports()" class="menu-item">
-                    <i class="fas fa-download"></i>
-                    <span>Export Data</span>
-                </a>
-            </div>
-
-            <!-- Settings -->
-            <div class="menu-section">
-                <div class="menu-section-title">Settings</div>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Help</span>
-                </a>
-            </div>
-
-            <!-- Logout -->
-            <a href="{% url 'authentication:logout' %}" class="menu-item logout-item" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </a>
-        </div>
-    </div>
-
-    <!-- Sidebar Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+        </nav>
+    </aside>
 
     <!-- Main Content -->
-    {% block content %}
-
-    <div class="main-content" id="mainContent">
+    <main class="main-content">
+        {% block content %}
         <!-- Welcome Section -->
         <div class="welcome-section">
-            <h1 class="welcome-title">Welcome back, {{ request.user.first_name }}! 👋</h1>
-            <p class="welcome-subtitle">Track, manage, and complete your assigned waste collections with ease and
-                accuracy.</p>
-            {% if next_pickup_date %}
-            <div class="alert alert-info mt-3">
-                <i class="fas fa-calendar-check"></i> Next Pickup Date: <strong>{{ next_pickup_date|date:"F j, Y"
-                    }}</strong>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- Chart Section -->
-        <div class="chart-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="section-title mb-0">
-                    <i class="fas fa-chart-bar"></i> This Month's Impact
-                </h4>
-                <div class="d-flex align-items-center gap-3">
-                    <select id="localbodyFilter" class="form-select form-select-sm" style="width: auto;">
-                        <option value="all">All Local Bodies</option>
-                    </select>
-                </div>
-            </div>
-            <div style="position: relative; height: 350px;">
-                <canvas id="impactChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Monthly Impact Graphs Section -->
-        <div class="analytics-section">
-            <h3 class="section-title">
-                <i class="fas fa-chart-line"></i> Monthly Impact Analytics
-            </h3>
-
-            <div class="row g-4 mb-4">
-                <!-- Monthly Collections Trend - Line Chart -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="analytics-card">
-                        <div class="card-header">
-                            <h5 class="card-title">
-                                <i class="fas fa-chart-line text-primary"></i>
-                                Collections Trend
-                            </h5>
-                            <div class="card-controls">
-                                <select class="form-select form-select-sm" id="collectionsPeriod">
-                                    <option value="6months">6 Months</option>
-                                    <option value="3months">3 Months</option>
-                                    <option value="1year">1 Year</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <h2 class="mb-0 text-primary fw-bold" id="totalCollectionsValue">0</h2>
-                                    <small class="text-muted">Total Collections</small>
-                                </div>
-                                <div class="text-center">
-                                    <h3 class="mb-0 text-success fw-bold" id="todayWeightValue">0 KG</h3>
-                                    <small class="text-muted">Today's Weight</small>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-success" id="collectionsGrowth">+0%</span>
-                                    <div><small class="text-muted">vs last period</small></div>
-                                </div>
-                            </div>
-                            <div style="position: relative; height: 200px;">
-                                <canvas id="monthlyCollectionsChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Monthly Weight Collection - Bar Chart -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="analytics-card">
-                        <div class="card-header">
-                            <h5 class="card-title">
-                                <i class="fas fa-weight-hanging text-success"></i>
-                                Weight Collection
-                            </h5>
-                            <div class="card-controls">
-                                <select class="form-select form-select-sm" id="weightPeriod">
-                                    <option value="6months">6 Months</option>
-                                    <option value="3months">3 Months</option>
-                                    <option value="1year">1 Year</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <h2 class="mb-0 text-success fw-bold" id="totalWeightValue">0 KG</h2>
-                                    <small class="text-muted">Total Weight</small>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-success" id="weightGrowth">+0%</span>
-                                    <div><small class="text-muted">vs last period</small></div>
-                                </div>
-                            </div>
-                            <div style="position: relative; height: 250px;">
-                                <canvas id="monthlyWeightChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Today's Collections - Real-time Chart -->
-                <div class="col-lg-4 col-md-6">
-                    <div class="analytics-card">
-                        <div class="card-header">
-                            <h5 class="card-title">
-                                <i class="fas fa-calendar-day text-info"></i>
-                                Today's Collections
-                            </h5>
-                            <div class="card-controls">
-                                <span class="badge bg-info" id="todayDate">Today</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <h2 class="mb-0 text-info fw-bold" id="todayCollectionsValue">0</h2>
-                                    <small class="text-muted">Today's Total</small>
-                                </div>
-                                <div class="text-center">
-                                    <h3 class="mb-0 text-success fw-bold" id="todayCollectionsWeight">0 KG</h3>
-                                    <small class="text-muted">Today's Weight</small>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-success" id="todayCollectionsStatus">Active</span>
-                                    <div><small class="text-muted">Status</small></div>
-                                </div>
-                            </div>
-                            <div style="position: relative; height: 200px;">
-                                <canvas id="todayCollectionsChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        <div class="quick-actions">
-            <h3 class="section-title">
-                <i class="fas fa-bolt"></i> Quick Actions
-            </h3>
-            <div class="row g-3">
-                <div class="col-lg col-md-4 col-6">
-                    <a href="{% url 'waste_collector:waste_collect_list' %}" class="action-card view">
-                        <div class="action-icon">
-                            <i class="fas fa-list-ul"></i>
-                        </div>
-                        <div class="action-title">View Records</div>
-                        <div class="action-description">All collection data</div>
-                    </a>
-                </div>
-                <div class="col-lg col-md-4 col-6">
-                    <a href="{% url 'waste_collector:assigned_customers' %}" class="action-card assigned">
-                        <div class="action-icon">
-                            <i class="fas fa-tasks"></i>
-                        </div>
-                        <div class="action-title">Assigned Waste</div>
-                        <div class="action-description">View assignments</div>
-                    </a>
-                </div>
-                <div class="col-lg col-md-4 col-6">
-                    <a href="{% url 'waste_collector:localbody_orders' %}" class="action-card orders">
-                        <div class="action-icon">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <div class="action-title">Local Body</div>
-                        <div class="action-description">Orders & requests</div>
-                    </a>
+            <div class="welcome-content">
+                <h1 class="welcome-title">Welcome back, {{ request.user.first_name }}! 👋</h1>
+                <p class="welcome-subtitle">Manage your waste collection and track your environmental impact</p>
+                <div class="status-badges">
+                    <span class="status-badge"><i class="fas fa-check"></i> Account Active</span>
+                    <span class="status-badge"><i class="fas fa-crown"></i> Premium Member</span>
                 </div>
             </div>
         </div>
 
-        <!-- Recent Activity Section -->
-        <div class="table-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="section-title mb-0">
-                    <i class="fas fa-clock"></i> Recent Activity
-                </h4>
-                <div>
-                    <button class="btn btn-outline-success btn-sm" onclick="refreshData(event)">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Pickup Schedule -->
+            <!-- Pickup Schedule -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-green"><i class="fas fa-calendar-alt"></i></div>
+                    <h3 class="card-title">Confirmed Pickup Date</h3>
+                </div>
+                <div class="card-content">
+                    {% if upcoming_pickup %}
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 1.2rem; font-weight: 600; color: #4CAF50; margin-bottom: 0.5rem;">
+                            {{ upcoming_pickup.localbody_calendar.date|date:"F d, l" }}
+                        </div>
+                        <div style="color: #666;">
+                             {{ upcoming_pickup.waste_info.waste_type|default:"General Waste" }}
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <a href="{% url 'customer:waste_profile_update' upcoming_pickup.waste_info.id %}"
+                            class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Reschedule
+                        </a>
+                        <a href="{% url 'customer:waste_profile_delete' upcoming_pickup.waste_info.id %}"
+                            class="btn btn-outline">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                    {% else %}
+                    <div style="text-align: center; padding: 1rem;">
+                        <p style="color: #666; margin-bottom: 1rem;">No upcoming pickups scheduled.</p>
+                        <a href="{% url 'customer:waste_profile_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Schedule Now
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
-            {% if recent_activities %}
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th><i class="fas fa-hashtag"></i> #</th>
-                            <th><i class="fas fa-user"></i> Customer</th>
-                            <th><i class="fas fa-building"></i> Local Body</th>
-                            <th><i class="fas fa-map-marker-alt"></i> Location</th>
-                            <th><i class="fas fa-weight-hanging"></i> Weight (KG)</th>
-                            <th><i class="fas fa-rupee-sign"></i> Amount</th>
-                            <th><i class="fas fa-calendar-alt"></i> Date & Time</th>
-                            <th><i class="fas fa-credit-card"></i> Payment</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for activity in recent_activities %}
-                        <tr data-localbody="{{ activity.localbody.name|default:'Unknown' }}" data-weight="{{ activity.kg|default:0 }}" data-revenue="{{ activity.total_amount|default:0 }}">
-                            <td><strong>{{ forloop.counter }}</strong></td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="avatar-circle bg-success text-white me-2"
-                                        style="width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem;">
-                                        {{ activity.customer.first_name|first|upper }}
-                                    </div>
-                                    <div>
-                                        <div class="fw-bold">{{ activity.customer.first_name }} </div>
-                                        <small class="text-muted">{{ activity.customer.email }}</small>
-                                    </div>
+
+            <div class="card" style="overflow: hidden; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div class="card-header">
+                    <div class="card-icon icon-green"><i class="fas fa-book"></i></div>
+                    <h3 class="card-title">Book Now</h3>
+                </div>
+
+                <div class="card-content" style="padding: 0;">
+                    <div class="animation-scene">
+                        <div class="sky">
+                            <div class="cloud cloud-1"></div>
+                            <div class="cloud cloud-2"></div>
+                        </div>
+
+                        <div class="road-surface">
+                            <div class="road-lines"></div>
+                        </div>
+
+                        <div class="truck-wrap">
+                            <div class="truck-cabin">
+                                <div class="window"></div>
+                                <div class="light"></div>
+                            </div>
+                            <div class="truck-container">
+                                <div class="truck-logo">
+                                    <img src="{% static 'images/logo.png.jpg' %}" alt="Logo"
+                                        style="height: 40px; border-radius: 50%; border: 2px solid white;">
                                 </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-info text-dark">
-                                    {{ activity.localbody.name|default:"N/A" }}
-                                </span>
-                            </td>
-                            <td>
-                                <div>
-                                    <i class="fas fa-map-pin text-danger"></i>
-                                    <small>{{ activity.location|truncatewords:5 }}</small>
-                                </div>
-                                <small class="text-muted">Ward: {{ activity.ward }}</small>
-                            </td>
-                            <td>
-                                <span class="badge bg-success">
-                                    <i class="fas fa-weight-hanging"></i> {{ activity.kg|floatformat:2 }} KG
-                                </span>
-                            </td>
-                            <td>
-                                <strong class="text-success">₹{{ activity.total_amount|floatformat:2 }}</strong>
-                            </td>
-                            <td>
-                                <div>
-                                    <i class="fas fa-calendar"></i> {{ activity.created_at|date:"M d, Y" }}
-                                </div>
-                                <small class="text-muted">
-                                    <i class="fas fa-clock"></i> {{ activity.created_at|time:"h:i A" }}
-                                </small>
-                            </td>
-                            <td>
-                                {% if activity.payment_method == 'cash_on_delivery' %}
-                                <span class="badge bg-warning text-dark">
-                                    <i class="fas fa-money-bill-wave"></i> Cash
-                                </span>
-                                {% elif activity.payment_method == 'upi' %}
-                                <span class="badge bg-primary">
-                                    <i class="fas fa-mobile-alt"></i> UPI
-                                </span>
-                                {% elif activity.payment_method == 'credit_card' %}
-                                <span class="badge bg-info">
-                                    <i class="fas fa-credit-card"></i> Card
-                                </span>
-                                {% else %}
-                                <span class="badge bg-secondary">
-                                    <i class="fas fa-question"></i> N/A
-                                </span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                <div class="waste-lines"></div>
+                            </div>
+                            <div class="wheel wheel-1">
+                                <div class="rim"></div>
+                            </div>
+                            <div class="wheel wheel-2">
+                                <div class="rim"></div>
+                            </div>
+                            <div class="wheel wheel-3">
+                                <div class="rim"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="nav-holder" style="gap: 15px; padding: 20px;">
+                        <a href="{% url 'customer:waste_profile_create' %}" class="btn btn-primary"
+                            style="flex: 1; margin: 0; justify-content: center;">
+                            <i class="fas fa-plus-circle"></i> Book
+                        </a>
+                        <a href="{% url 'customer:waste_profile_list' %}" class="btn btn-primary"
+                            style="flex: 1; margin: 0; justify-content: center;">
+                            <i class="fas fa-history"></i> Records
+                        </a>
+                    </div>
+                </div>
             </div>
 
-            <div class="text-center mt-3">
-                <a href="{% url 'waste_collector:waste_collect_list' %}" class="btn btn-outline-success">
-                    <i class="fas fa-list"></i> View All Collections
-                </a>
+            <!-- Waste Guidelines Section -->
+            <div id="waste-guidelines" class="card" style="display: none;">
+                <div class="card-header">
+                    <div class="card-icon icon-green"><i class="fas fa-recycle"></i></div>
+                    <h3 class="card-title">Waste Handling Guidelines</h3>
+                </div>
+                <div class="card-content">
+                    <div class="guideline-section">
+                        <h4><i class="fas fa-sort"></i> Segregation Guidelines</h4>
+                        <div class="guideline-item">
+                            <div class="guideline-icon">
+                                <i class="fas fa-leaf" style="color: #4CAF50;"></i>
+                            </div>
+                            <div class="guideline-content">
+                                <h5>Organic Waste</h5>
+                                <p>Food scraps, vegetable peels, coffee grounds, and garden waste should be placed in
+                                    green bins. Keep them separate from other waste types.</p>
+                            </div>
+                        </div>
+                        <div class="guideline-item">
+                            <div class="guideline-icon">
+                                <i class="fas fa-recycle" style="color: #2196F3;"></i>
+                            </div>
+                            <div class="guideline-content">
+                                <h5>Recyclable Waste</h5>
+                                <p>Paper, plastic, glass, and metal items should be clean and dry before placing in blue
+                                    bins. Remove any food residue from containers.</p>
+                            </div>
+                        </div>
+                        <div class="guideline-item">
+                            <div class="guideline-icon">
+                                <i class="fas fa-trash-alt" style="color: #FF9800;"></i>
+                            </div>
+                            <div class="guideline-content">
+                                <h5>Non-Recyclable Waste</h5>
+                                <p>Items that cannot be recycled, such as dirty plastics, ceramics, and sanitary waste,
+                                    should go in grey bins.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guideline-section">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Hazardous Waste</h4>
+                        <div class="guideline-item">
+                            <div class="guideline-icon">
+                                <i class="fas fa-battery-full" style="color: #F44336;"></i>
+                            </div>
+                            <div class="guideline-content">
+                                <h5>Electronic Waste</h5>
+                                <p>Batteries, electronic devices, and light bulbs should be disposed of at designated
+                                    collection centers. Do not mix with regular waste.</p>
+                            </div>
+                        </div>
+                        <div class="guideline-item">
+                            <div class="guideline-icon">
+                                <i class="fas fa-flask" style="color: #9C27B0;"></i>
+                            </div>
+                            <div class="guideline-content">
+                                <h5>Chemical Waste</h5>
+                                <p>Paints, solvents, pesticides, and cleaning chemicals should be kept separate and
+                                    disposed of according to local regulations.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guideline-section">
+                        <h4><i class="fas fa-clock"></i> Collection Best Practices</h4>
+                        <div class="guideline-item">
+                            <div class="guideline-icon">
+                                <i class="fas fa-calendar-check" style="color: #009688;"></i>
+                            </div>
+                            <div class="guideline-content">
+                                <h5>Timing</h5>
+                                <p>Place your bins at the curb by 7:00 AM on your scheduled collection day. Ensure they
+                                    are easily accessible to collection crews.</p>
+                            </div>
+                        </div>
+                        <div class="guideline-item">
+                            <div class="guideline-icon">
+                                <i class="fas fa-info-circle" style="color: #607D8B;"></i>
+                            </div>
+                            <div class="guideline-content">
+                                <h5>Preparation</h5>
+                                <p>Keep bins clean and ensure lids are closed. Do not overfill bins as this can cause
+                                    spillage during collection.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back to Dashboard Button -->
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <button class="btn btn-primary" onclick="showDashboard()">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </button>
+                    </div>
+                </div>
             </div>
-            {% else %}
-            <div class="empty-state text-center py-5">
-                <i class="fas fa-clipboard-list fa-3x text-muted mb-3 empty-icon"></i>
-                <h5 class="text-muted mb-2">No Recent Activity</h5>
-                <p class="text-muted">No recent activity to display. Start a new waste assignment to see your data here.</p>
-            </div>
-            {% endif %}
+
+            <!-- Add JavaScript to handle navigation -->
+            <script>
+                // Function to show waste guidelines section
+                function showWasteGuidelines() {
+                    // Hide other sections
+                    document.querySelector('.dashboard-grid').style.display = 'none';
+                    // Show waste guidelines
+                    document.getElementById('waste-guidelines').style.display = 'block';
+                }
+
+                // Function to go back to dashboard
+                function showDashboard() {
+                    // Show dashboard
+                    document.querySelector('.dashboard-grid').style.display = 'grid';
+                    // Hide waste guidelines
+                    document.getElementById('waste-guidelines').style.display = 'none';
+                }
+            </script>
+
+            {% endblock %}
+    </main>
+
+    <!-- About Us Modal -->
+    <div id="aboutUsModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1002;">
+        <div
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 15px; max-width: 500px; text-align: center;">
+            <h2>About SuchiGo</h2>
+            <p>SuchiGo is a comprehensive waste management platform designed to streamline collection, recycling, and
+                sustainability efforts for communities and businesses.</p>
+            <button onclick="closeAboutUsModal()" class="btn btn-primary">Close</button>
         </div>
     </div>
 
-    <!-- Report Generation Modal -->
-    <div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header border-0 pb-0"
-                    style="background: linear-gradient(135deg, #2e8b57 0%, #1c6d42 100%); border-radius: 20px 20px 0 0; padding: 1.5rem;">
-                    <h5 class="modal-title text-white fw-bold" id="reportModalLabel">
-                        <i class="fas fa-file-export me-2"></i> Generate Collection Report
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <p class="text-muted mb-4">Select a date range to export your waste collection records as a CSV
-                        file.</p>
-
-                    <form id="reportForm" action="{% url 'waste_collector:generate_report' %}" method="GET">
-                        <div class="mb-3">
-                            <label class="form-label fw-600">From Date</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">
-                                    <i class="fas fa-calendar-alt text-success"></i>
-                                </span>
-                                <input type="date" name="start_date" class="form-control border-start-0 ps-0" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-600">To Date</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">
-                                    <i class="fas fa-calendar-alt text-success"></i>
-                                </span>
-                                <input type="date" name="end_date" class="form-control border-start-0 ps-0" required>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-success">
-                                <i class="fas fa-download me-2"></i> Generate Report
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <button class="chat-toggle" onclick="toggleChat()"><i class="fas fa-comments"></i></button>
     </div>
-    {% endblock %}
 
     <script>
-        // Real data from backend
-        const totalCollections = parseInt("{{ total_collections|default:'0' }}") || 0;
-        const todayCollections = parseInt("{{ today_collections|default:'0' }}") || 0;
-        const totalWeight = parseFloat("{{ total_weight|default:'0' }}") || 0;
-        const totalRevenue = parseFloat("{{ total_revenue|default:'0' }}") || 0;
-
-        // Sidebar functionality
+        // Toggle Sidebar
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
             const overlay = document.getElementById('sidebarOverlay');
-
-            sidebar.classList.toggle('active');
-            mainContent.classList.toggle('sidebar-open');
+            sidebar.classList.toggle('mobile-open');
             overlay.classList.toggle('active');
         }
 
-        function closeSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const overlay = document.getElementById('sidebarOverlay');
-
-            sidebar.classList.remove('active');
-            mainContent.classList.remove('sidebar-open');
-            overlay.classList.remove('active');
+        // Toggle Notifications
+        function toggleNotifications() {
+            const dropdown = document.getElementById('notificationDropdown');
+            const userDropdown = document.getElementById('userDropdown');
+            userDropdown.style.display = 'none';
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Initialize charts when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeCharts();
-            updateMetrics();
+        // Toggle User Dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            notificationDropdown.style.display = 'none';
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // About Us Modal Functions
+        function openAboutUsModal() {
+            document.getElementById('aboutUsModal').style.display = 'block';
+        }
+
+        function closeAboutUsModal() {
+            document.getElementById('aboutUsModal').style.display = 'none';
+        }
+
+        // Share Services Function
+        function shareServices() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'SuchiGo Waste Management Services',
+                    text: 'Check out SuchiGo - Efficient waste collection and recycling solutions!',
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                const text = 'Check out SuchiGo - Efficient waste collection and recycling solutions! ' + window.location.href;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Share link copied to clipboard!');
+                });
+            }
+        }
+
+        // Toggle Chat
+        function toggleChat() {
+            alert('Chat feature coming soon!');
+        }
+
+        // Close dropdowns and modal when clicking outside
+        document.addEventListener('click', function (event) {
+            const notificationBell = document.querySelector('.notification-bell');
+            const userProfile = document.querySelector('.user-profile');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+            const userDropdown = document.getElementById('userDropdown');
+            const aboutUsModal = document.getElementById('aboutUsModal');
+
+            if (!notificationBell.contains(event.target)) {
+                notificationDropdown.style.display = 'none';
+            }
+            if (!userProfile.contains(event.target)) {
+                userDropdown.style.display = 'none';
+            }
+            if (aboutUsModal && event.target === aboutUsModal) {
+                closeAboutUsModal();
+            }
         });
 
-        function initializeCharts() {
-            // Impact Chart - This Month's Impact
-            const impactCanvas = document.getElementById('impactChart');
-            if (impactCanvas) {
-                const ctx = impactCanvas.getContext('2d');
-
-                // Extract local body data from the page
-                const localBodyData = {
-                    names: [],
-                    weights: [],
-                    revenues: []
-                };
-
-                const activityElements = document.querySelectorAll('[data-localbody]');
-                if (activityElements.length > 0) {
-                    const bodyMap = {};
-                    activityElements.forEach(el => {
-                        const name = el.dataset.localbody;
-                        const weight = parseFloat(el.dataset.weight) || 0;
-                        const revenue = parseFloat(el.dataset.revenue) || 0;
-
-                        if (!bodyMap[name]) {
-                            bodyMap[name] = { weight: 0, revenue: 0 };
-                        }
-                        bodyMap[name].weight += weight;
-                        bodyMap[name].revenue += revenue;
-                    });
-
-                    Object.keys(bodyMap).forEach(name => {
-                        localBodyData.names.push(name);
-                        localBodyData.weights.push(bodyMap[name].weight);
-                        localBodyData.revenues.push(bodyMap[name].revenue);
-                    });
-                } else {
-                    // Fallback data when no activities exist
-                    localBodyData.names = ['No Data Available'];
-                    localBodyData.weights = [0];
-                    localBodyData.revenues = [0];
-                }
-
-                // Populate local body dropdown
-                const localbodyFilter = document.getElementById('localbodyFilter');
-                if (localbodyFilter && localBodyData.names.length > 0) {
-                    localbodyFilter.innerHTML = '<option value="all">All Local Bodies</option>';
-                    localBodyData.names.forEach(name => {
-                        if (name !== 'No Data Available') {
-                            const option = document.createElement('option');
-                            option.value = name;
-                            option.textContent = name;
-                            localbodyFilter.appendChild(option);
-                        }
-                    });
-                }
-
-                // Chart update function
-                function updateChart(selectedLocalBody = 'all') {
-                    let chartLabels, chartWeights, chartRevenues;
-
-                    if (selectedLocalBody === 'all') {
-                        chartLabels = localBodyData.names;
-                        chartWeights = localBodyData.weights;
-                        chartRevenues = localBodyData.revenues;
-                    } else {
-                        const index = localBodyData.names.indexOf(selectedLocalBody);
-                        if (index !== -1) {
-                            chartLabels = [selectedLocalBody];
-                            chartWeights = [localBodyData.weights[index]];
-                            chartRevenues = [localBodyData.revenues[index]];
-                        } else {
-                            chartLabels = ['No Data'];
-                            chartWeights = [0];
-                            chartRevenues = [0];
-                        }
-                    }
-
-                    if (window.impactChartInstance) {
-                        window.impactChartInstance.destroy();
-                    }
-
-                    window.impactChartInstance = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: chartLabels,
-                            datasets: [
-                                {
-                                    label: 'Weight Collected (KG)',
-                                    data: chartWeights,
-                                    backgroundColor: 'rgba(74, 222, 128, 0.7)',
-                                    borderColor: 'rgba(74, 222, 128, 1)',
-                                    borderWidth: 1,
-                                    borderRadius: 5
-                                },
-                                {
-                                    label: 'Earnings (₹)',
-                                    data: chartRevenues,
-                                    backgroundColor: 'rgba(34, 211, 238, 0.7)',
-                                    borderColor: 'rgba(34, 211, 238, 1)',
-                                    borderWidth: 1,
-                                    borderRadius: 5
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            animation: {
-                                duration: 1000,
-                                easing: 'easeInOutQuart'
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)'
-                                    }
-                                },
-                                x: {
-                                    grid: {
-                                        display: false
-                                    }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    position: 'top',
-                                    labels: {
-                                        usePointStyle: true,
-                                        padding: 20,
-                                        font: {
-                                            size: 12
-                                        }
-                                    }
-                                },
-                                tooltip: {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                    padding: 12,
-                                    cornerRadius: 8,
-                                    titleFont: {
-                                        size: 14
-                                    },
-                                    bodyFont: {
-                                        size: 13
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                updateChart();
-
-                if (localbodyFilter) {
-                    localbodyFilter.addEventListener('change', function(e) {
-                        updateChart(e.target.value);
-                    });
-                }
+        // Handle window resize
+        window.addEventListener('resize', function () {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
             }
+        });
 
-            // Monthly Collections Chart
-            const collectionsCanvas = document.getElementById('monthlyCollectionsChart');
-            if (collectionsCanvas) {
-                const ctx = collectionsCanvas.getContext('2d');
-
-                // Generate realistic monthly data based on actual totals
-                const months = 6;
-                const labels = getMonthLabels(months);
-                const collectionsData = generateMonthlyDistribution(totalCollections, months);
-                const growthPercentage = collectionsData.length > 1 ?
-                    ((collectionsData[collectionsData.length - 1] - collectionsData[0]) / Math.max(collectionsData[0], 1) * 100).toFixed(1) : 0;
-
-                // Update displays
-                document.getElementById('totalCollectionsValue').textContent = totalCollections;
-                document.getElementById('todayWeightValue').textContent = Math.round(totalWeight) + ' KG';
-                document.getElementById('collectionsGrowth').textContent = (growthPercentage > 0 ? '+' : '') + growthPercentage + '%';
-                document.getElementById('collectionsGrowth').className = 'badge ' + (growthPercentage > 0 ? 'bg-success' : 'bg-danger');
-
-                window.collectionsChartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Collections',
-                            data: collectionsData,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#3b82f6',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5,
-                            pointHoverRadius: 7
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                padding: 12,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Collections: ' + Math.round(context.parsed.y);
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Number of Collections'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Monthly Weight Chart
-            const weightCanvas = document.getElementById('monthlyWeightChart');
-            if (weightCanvas) {
-                const ctx = weightCanvas.getContext('2d');
-
-                const months = 6;
-                const labels = getMonthLabels(months);
-                const weightData = generateMonthlyDistribution(totalWeight, months);
-                const growthPercentage = weightData.length > 1 ?
-                    ((weightData[weightData.length - 1] - weightData[0]) / Math.max(weightData[0], 1) * 100).toFixed(1) : 0;
-
-                // Update displays
-                document.getElementById('totalWeightValue').textContent = Math.round(totalWeight) + ' KG';
-                document.getElementById('weightGrowth').textContent = (growthPercentage > 0 ? '+' : '') + growthPercentage + '%';
-                document.getElementById('weightGrowth').className = 'badge ' + (growthPercentage > 0 ? 'bg-success' : 'bg-danger');
-
-                window.weightChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Weight (KG)',
-                            data: weightData,
-                            backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                            borderColor: 'rgba(34, 197, 94, 1)',
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            borderSkipped: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                padding: 12,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Weight: ' + Math.round(context.parsed.y) + ' KG';
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Weight (KG)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Today's Collections Chart
-            const todayCanvas = document.getElementById('todayCollectionsChart');
-            if (todayCanvas) {
-                const ctx = todayCanvas.getContext('2d');
-
-                // Set today's date
-                const today = new Date();
-                const todayString = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                document.getElementById('todayDate').textContent = todayString;
-
-                // Generate realistic hourly data for today based on actual collections
-                const hours = [];
-                const collectionsData = [];
-                const currentHour = new Date().getHours();
-
-                for (let i = 8; i <= 20; i++) {
-                    if (i <= currentHour) {
-                        hours.push(i + ':00');
-                        if (todayCollections > 0) {
-                            const hourProgress = (i - 8) / (currentHour - 8 || 1);
-                            const baseCollections = Math.floor(todayCollections * hourProgress / 12);
-                            const variance = Math.floor(Math.random() * 2) - 1;
-                            collectionsData.push(Math.max(0, baseCollections + variance));
-                        } else {
-                            collectionsData.push(0);
-                        }
-                    }
-                }
-
-                // Update displays
-                document.getElementById('todayCollectionsValue').textContent = todayCollections;
-
-                const weightElement = document.getElementById('todayCollectionsWeight');
-                if (weightElement && totalCollections > 0) {
-                    const avgWeightPerCollection = totalWeight / totalCollections;
-                    const todayWeightEstimate = Math.round(todayCollections * avgWeightPerCollection);
-                    weightElement.textContent = todayWeightEstimate + ' KG';
-                }
-
-                // Update status based on current time
-                if (currentHour < 12) {
-                    document.getElementById('todayCollectionsStatus').textContent = 'Morning';
-                    document.getElementById('todayCollectionsStatus').className = 'badge bg-info';
-                } else if (currentHour < 17) {
-                    document.getElementById('todayCollectionsStatus').textContent = 'Active';
-                    document.getElementById('todayCollectionsStatus').className = 'badge bg-success';
-                } else {
-                    document.getElementById('todayCollectionsStatus').textContent = 'Evening';
-                    document.getElementById('todayCollectionsStatus').className = 'badge bg-warning';
-                }
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: hours,
-                        datasets: [{
-                            label: 'Collections',
-                            data: collectionsData,
-                            borderColor: '#0ea5e9',
-                            backgroundColor: 'rgba(14, 165, 233, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#0ea5e9',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                padding: 12,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Collections: ' + context.parsed.y;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Collections'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Add event listeners for period filters
-            ['collectionsPeriod', 'weightPeriod'].forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.addEventListener('change', function() {
-                        updateMonthlyCharts();
+        // Smooth scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
                     });
                 }
             });
-        }
-
-        function updateMonthlyCharts() {
-            const collectionsPeriod = document.getElementById('collectionsPeriod')?.value || '6months';
-            const weightPeriod = document.getElementById('weightPeriod')?.value || '6months';
-
-            let collectionsMonths, weightMonths;
-
-            // Convert period values to month counts
-            switch(collectionsPeriod) {
-                case '3months': collectionsMonths = 3; break;
-                case '1year': collectionsMonths = 12; break;
-                default: collectionsMonths = 6;
-            }
-
-            switch(weightPeriod) {
-                case '3months': weightMonths = 3; break;
-                case '1year': weightMonths = 12; break;
-                default: weightMonths = 6;
-            }
-
-            // Update Collections Chart
-            const collectionsCanvas = document.getElementById('monthlyCollectionsChart');
-            if (collectionsCanvas && window.collectionsChartInstance) {
-                window.collectionsChartInstance.destroy();
-
-                const ctx = collectionsCanvas.getContext('2d');
-                const labels = getMonthLabels(collectionsMonths);
-                const collectionsData = generateMonthlyDistribution(totalCollections, collectionsMonths);
-                const growthPercentage = collectionsData.length > 1 ?
-                    ((collectionsData[collectionsData.length - 1] - collectionsData[0]) / Math.max(collectionsData[0], 1) * 100).toFixed(1) : 0;
-
-                document.getElementById('collectionsGrowth').textContent = (growthPercentage > 0 ? '+' : '') + growthPercentage + '%';
-                document.getElementById('collectionsGrowth').className = 'badge ' + (growthPercentage > 0 ? 'bg-success' : 'bg-danger');
-
-                window.collectionsChartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Collections',
-                            data: collectionsData,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#3b82f6',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2,
-                            pointRadius: 5,
-                            pointHoverRadius: 7
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                padding: 12,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Collections: ' + Math.round(context.parsed.y);
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Number of Collections'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Update Weight Chart
-            const weightCanvas = document.getElementById('monthlyWeightChart');
-            if (weightCanvas && window.weightChartInstance) {
-                window.weightChartInstance.destroy();
-
-                const ctx = weightCanvas.getContext('2d');
-                const labels = getMonthLabels(weightMonths);
-                const weightData = generateMonthlyDistribution(totalWeight, weightMonths);
-                const growthPercentage = weightData.length > 1 ?
-                    ((weightData[weightData.length - 1] - weightData[0]) / Math.max(weightData[0], 1) * 100).toFixed(1) : 0;
-
-                document.getElementById('weightGrowth').textContent = (growthPercentage > 0 ? '+' : '') + growthPercentage + '%';
-                document.getElementById('weightGrowth').className = 'badge ' + (growthPercentage > 0 ? 'bg-success' : 'bg-danger');
-
-                window.weightChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Weight (KG)',
-                            data: weightData,
-                            backgroundColor: 'rgba(34, 197, 94, 0.7)',
-                            borderColor: 'rgba(34, 197, 94, 1)',
-                            borderWidth: 1,
-                            borderRadius: 6,
-                            borderSkipped: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                padding: 12,
-                                cornerRadius: 8,
-                                callbacks: {
-                                    label: function(context) {
-                                        return 'Weight: ' + Math.round(context.parsed.y) + ' KG';
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Weight (KG)'
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        }
-
-        function getMonthLabels(months) {
-            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const currentMonth = new Date().getMonth();
-            const labels = [];
-            for (let i = months - 1; i >= 0; i--) {
-                const monthIndex = (currentMonth - i + 12) % 12;
-                labels.push(monthNames[monthIndex]);
-            }
-            return labels;
-        }
-
-        function generateMonthlyDistribution(totalValue, months, variance = 0.3) {
-            const data = [];
-            let remaining = totalValue;
-
-            for (let i = 0; i < months; i++) {
-                if (i === months - 1) {
-                    data.push(Math.max(0, remaining));
-                } else {
-                    const avgValue = totalValue / months;
-                    const monthValue = avgValue * (1 + (Math.random() - 0.5) * variance);
-                    data.push(Math.max(0, Math.min(monthValue, remaining * 0.6)));
-                    remaining -= data[i];
-                }
-            }
-            return data;
-        }
-
-        function updateMetrics() {
-            // Update analytics metrics
-            const avgDaily = (totalCollections / 30).toFixed(1);
-            const avgWeight = totalCollections > 0 ? (totalWeight / totalCollections).toFixed(1) : 0;
-            const avgRevenue = totalCollections > 0 ? (totalRevenue / totalCollections).toFixed(0) : 0;
-
-            const avgDailyElement = document.getElementById('avgDailyCollections');
-            const avgWeightElement = document.getElementById('avgWeightPerCollection');
-            const avgRevenueElement = document.getElementById('avgRevenuePerCollection');
-
-            if (avgDailyElement) avgDailyElement.textContent = avgDaily;
-            if (avgWeightElement) avgWeightElement.textContent = avgWeight + ' KG';
-            if (avgRevenueElement) avgRevenueElement.textContent = '₹' + avgRevenue;
-        }
-
-        // Utility functions
-        function refreshData(event) {
-            event.preventDefault();
-            window.location.reload();
-        }
-
-        function generateReports() {
-            // Show report modal if it exists
-            const modal = document.getElementById('reportModal');
-            if (modal) {
-                const bsModal = new bootstrap.Modal(modal);
-                bsModal.show();
-            }
-        }
-
-        function logout() {
-            window.location.href = "{% url 'authentication:logout' %}";
-        }
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function (e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                const searchInput = document.getElementById('globalSearch');
-                if (searchInput) searchInput.focus();
-            }
-            if (e.key === 'Escape') closeSidebar();
         });
     </script>
 </body>
