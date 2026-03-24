@@ -1,0 +1,595 @@
+{% extends 'waste_collector_dashboard.html' %}
+
+{% block title %}Cash Management{% endblock %}
+
+{% block content %}
+<style>
+.cash-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+.cash-header {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.cash-header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.balance-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.balance-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+    border-left: 4px solid #28a745;
+}
+
+.balance-card h3 {
+    margin: 0 0 1rem 0;
+    color: #495057;
+    font-size: 1.1rem;
+}
+
+.balance-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.balance-amount.positive {
+    color: #28a745;
+}
+
+.balance-amount.negative {
+    color: #dc3545;
+}
+
+.transaction-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.transaction-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.section-header {
+    background: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-header h3 {
+    margin: 0;
+    color: #495057;
+}
+
+.section-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-add {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.btn-add:hover {
+    background: #218838;
+}
+
+.transaction-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.transaction-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f1f3f4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-info {
+    flex: 1;
+}
+
+.transaction-amount {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.transaction-amount.collection {
+    color: #28a745;
+}
+
+.transaction-amount.expense {
+    color: #dc3545;
+}
+
+.transaction-meta {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.recent-summaries {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+}
+
+.summary-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f3f4;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 768px) {
+    .cash-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .transaction-sections {
+        grid-template-columns: 1fr;
+    }
+    
+    .balance-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =============================================
+   RESPONSIVE ENHANCEMENTS — ADDED ONLY
+   (No existing styles were changed above)
+   ============================================= */
+
+/* --- Base mobile-first improvements --- */
+* {
+    box-sizing: border-box;
+}
+
+/* Prevent horizontal scroll on all screens */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* --- Large tablets (max 1024px) --- */
+@media (max-width: 1024px) {
+    .cash-container {
+        max-width: 100%;
+        margin: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .cash-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .balance-amount {
+        font-size: 1.75rem;
+    }
+
+    .transaction-sections {
+        gap: 1.25rem;
+    }
+}
+
+/* --- Small tablets (max 900px) --- */
+@media (max-width: 900px) {
+    .transaction-sections {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .balance-cards {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* --- Phones (max 768px) — extends existing breakpoint --- */
+@media (max-width: 768px) {
+    .cash-container {
+        margin: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .cash-header {
+        padding: 1.25rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .cash-header h1 {
+        font-size: 1.35rem;
+        line-height: 1.3;
+    }
+
+    .cash-header p {
+        font-size: 0.9rem;
+        margin: 0.5rem 0 0 0;
+    }
+
+    /* Stack balance cards single column */
+    .balance-cards {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .balance-card {
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+        border-left: 4px solid #28a745;
+        border-radius: 8px;
+    }
+
+    .balance-card h3 {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .balance-amount {
+        font-size: 1.4rem;
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    /* Full width transaction sections stacked */
+    .transaction-sections {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .section-header {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .section-header h3 {
+        font-size: 1rem;
+    }
+
+    .btn-add {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .transaction-list {
+        max-height: 300px;
+    }
+
+    .transaction-item {
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+    }
+
+    .transaction-amount {
+        font-size: 1rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .transaction-info {
+        min-width: 0; /* allow text truncation */
+    }
+
+    .transaction-info strong {
+        font-size: 0.9rem;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .transaction-meta {
+        font-size: 0.78rem;
+        line-height: 1.4;
+    }
+
+    .recent-summaries {
+        padding: 1rem;
+        border-radius: 8px;
+    }
+
+    .recent-summaries h3 {
+        font-size: 1rem;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .summary-item {
+        padding: 0.6rem 0;
+        font-size: 0.9rem;
+        gap: 0.5rem;
+    }
+}
+
+/* --- Small phones (max 480px) --- */
+@media (max-width: 480px) {
+    .cash-container {
+        margin: 0;
+        padding: 0.5rem;
+        border-radius: 0;
+    }
+
+    .cash-header {
+        border-radius: 6px;
+        padding: 1rem 0.75rem;
+    }
+
+    .cash-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .cash-header p {
+        font-size: 0.82rem;
+    }
+
+    .balance-card {
+        padding: 0.75rem;
+        border-radius: 6px;
+    }
+
+    .balance-card h3 {
+        font-size: 0.82rem;
+    }
+
+    .balance-amount {
+        font-size: 1.25rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        padding: 0.6rem 0.75rem;
+    }
+
+    .section-actions {
+        width: 100%;
+    }
+
+    .btn-add {
+        width: 100%;
+        text-align: center;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .transaction-item {
+        padding: 0.6rem 0.75rem;
+    }
+
+    .transaction-list {
+        max-height: 250px;
+    }
+
+    .recent-summaries {
+        padding: 0.75rem;
+    }
+
+    .summary-item {
+        font-size: 0.85rem;
+    }
+}
+
+/* --- Very small phones (max 360px) --- */
+@media (max-width: 360px) {
+    .cash-header h1 {
+        font-size: 1.05rem;
+    }
+
+    .balance-amount {
+        font-size: 1.1rem;
+    }
+
+    .transaction-amount {
+        font-size: 0.9rem;
+    }
+
+    .transaction-meta {
+        font-size: 0.72rem;
+    }
+}
+
+/* --- Touch-friendly tap targets --- */
+@media (hover: none) and (pointer: coarse) {
+    .btn-add {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .transaction-item {
+        min-height: 48px;
+    }
+
+    .summary-item {
+        min-height: 44px;
+    }
+}
+
+/* --- Scrollbar styling for transaction list on mobile --- */
+.transaction-list {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #dee2e6 transparent;
+}
+
+.transaction-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.transaction-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.transaction-list::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 4px;
+}
+</style>
+
+<div class="cash-container">
+    <div class="cash-header">
+        <h1>Cash Management Dashboard</h1>
+        <p>Manage your daily cash collections and expenses</p>
+    </div>
+
+    <!-- Balance Overview -->
+    <div class="balance-cards">
+        <div class="balance-card">
+            <h3>Total Collected Today</h3>
+            <div class="balance-amount positive">₹{{ total_collected|floatformat:2 }}</div>
+        </div>
+        <div class="balance-card">
+            <h3>Total Expenses Today</h3>
+            <div class="balance-amount negative">₹{{ total_spent|floatformat:2 }}</div>
+        </div>
+        <div class="balance-card">
+            <h3>Current Balance</h3>
+            <div class="balance-amount {% if current_balance >= 0 %}positive{% else %}negative{% endif %}">
+                ₹{{ current_balance|floatformat:2 }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions -->
+    <div class="transaction-sections">
+        <!-- Cash Collections -->
+        <div class="transaction-section">
+            <div class="section-header">
+                <h3>Cash Collections</h3>
+                <div class="section-actions">
+                    <a href="{% url 'waste_collector:add_cash_collection' %}" class="btn-add">
+                        <i class="fas fa-plus"></i> Add Collection
+                    </a>
+                </div>
+            </div>
+            <div class="transaction-list">
+                {% for collection in cash_collections %}
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <strong>{{ collection.customer.username }}</strong>
+                        <div class="transaction-meta">
+                            {{ collection.collection_date }} at {{ collection.collection_time }}
+                            {% if collection.notes %}
+                            <br><em>{{ collection.notes }}</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="transaction-amount collection">
+                        +₹{{ collection.amount|floatformat:2 }}
+                    </div>
+                </div>
+                {% empty %}
+                <div style="padding: 2rem; text-align: center; color: #6c757d;">
+                    No cash collections recorded for today
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Cash Expenses -->
+        <div class="transaction-section">
+            <div class="section-header">
+                <h3>Cash Expenses</h3>
+                <div class="section-actions">
+                    <a href="{% url 'waste_collector:add_cash_expense' %}" class="btn-add">
+                        <i class="fas fa-plus"></i> Add Expense
+                    </a>
+                </div>
+            </div>
+            <div class="transaction-list">
+                {% for expense in cash_expenses %}
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <strong>{{ expense.get_category_display }}</strong>
+                        <div class="transaction-meta">
+                            {{ expense.expense_date }}
+                            {% if expense.description %}
+                            <br><em>{{ expense.description }}</em>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="transaction-amount expense">
+                        -₹{{ expense.amount|floatformat:2 }}
+                    </div>
+                </div>
+                {% empty %}
+                <div style="padding: 2rem; text-align: center; color: #6c757d;">
+                    No expenses recorded for today
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Summaries -->
+    <div class="recent-summaries">
+        <h3>Recent Daily Summaries</h3>
+        {% for summary in recent_summaries %}
+        <div class="summary-item">
+            <span>{{ summary.date }}</span>
+            <span>₹{{ summary.closing_balance|floatformat:2 }}</span>
+        </div>
+        {% empty %}
+        <div style="padding: 2rem; text-align: center; color: #6c757d;">
+            No daily summaries available
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
