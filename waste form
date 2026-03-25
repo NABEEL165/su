@@ -259,6 +259,46 @@
         transform: translateY(-1px);
     }
 
+    /* Current Location Button Styles */
+    .waste-form-container .current-location-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .waste-form-container .current-location-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+
+    .waste-form-container .current-location-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .waste-form-container .location-status {
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+    }
+
     /* Mobile Responsive */
     @media (max-width: 768px) {
         .waste-form-container {
@@ -418,8 +458,14 @@
             <div class="form-group full-width">
                 <label>Pickup Location on Map</label>
                 <div id="pickup-map" style="width: 100%; height: 300px; border-radius: 12px; border: 2px solid #e9ecef; overflow: hidden;"></div>
+                <div style="display: flex; gap: 10px; margin-top: 8px; align-items: center;">
+                    <button type="button" id="current-location-btn" class="current-location-btn">
+                        📍 Use Current Location
+                    </button>
+                    <small id="location-status" class="location-status"></small>
+                </div>
                 <small style="display: block; margin-top: 8px; color: #6c757d;">
-                    Drag the marker or tap on the map to set your exact pickup location.
+                    <!--Drag the marker or tap on the map to set your exact pickup location.-->
                 </small>
             </div>
 
@@ -752,6 +798,8 @@ $(document).ready(function(){
 
 <script>
 let pickupMapInitialized = false;
+let map = null;
+let marker = null;
 
 function initializePickupMap() {
     if (pickupMapInitialized) {
@@ -772,13 +820,13 @@ function initializePickupMap() {
         lng: !isNaN(existingLng) ? existingLng : 76.2144
     };
 
-    const map = new google.maps.Map(mapElement, {
+    map = new google.maps.Map(mapElement, {
         zoom: 15,
         center: defaultCenter,
         mapTypeId: 'roadmap'
     });
 
-    const marker = new google.maps.Marker({
+    marker = new google.maps.Marker({
         position: defaultCenter,
         map: map,
         draggable: true
@@ -806,6 +854,134 @@ function initializePickupMap() {
     marker.addListener('dragend', function (event) {
         updateLatLng(event.latLng);
     });
+
+    // Current location button functionality
+    const currentLocationBtn = document.getElementById('current-location-btn');
+    const locationStatus = document.getElementById('location-status');
+
+    console.log('Current location button found:', !!currentLocationBtn);
+
+    if (currentLocationBtn) {
+        currentLocationBtn.addEventListener('click', function() {
+            console.log('Current location button clicked');
+            if (!navigator.geolocation) {
+                locationStatus.textContent = 'Geolocation is not supported by your browser';
+                locationStatus.style.color = '#dc3545';
+                return;
+            }
+
+            locationStatus.textContent = 'Getting your location...';
+            locationStatus.style.color = '#ffc107';
+            currentLocationBtn.disabled = true;
+            currentLocationBtn.style.opacity = '0.6';
+
+            // First try with high accuracy
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    console.log('Location found:', position.coords);
+                    const pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    // Update map center and marker position
+                    if (map && marker) {
+                        map.setCenter(pos);
+                        map.setZoom(16);
+                        marker.setPosition(pos);
+                        updateLatLng(pos);
+                    }
+
+                    locationStatus.textContent = '✓ Location found successfully';
+                    locationStatus.style.color = '#28a745';
+                    currentLocationBtn.disabled = false;
+                    currentLocationBtn.style.opacity = '1';
+
+                    // Clear status message after 3 seconds
+                    setTimeout(() => {
+                        locationStatus.textContent = '';
+                    }, 3000);
+                },
+                function(error) {
+                    console.error('High accuracy geolocation failed:', error);
+
+                    // Try again with lower accuracy as fallback
+                    if (error.code === error.TIMEOUT) {
+                        locationStatus.textContent = 'Trying with lower accuracy...';
+                        locationStatus.style.color = '#ffc107';
+
+                        navigator.geolocation.getCurrentPosition(
+                            function(position) {
+                                console.log('Location found with low accuracy:', position.coords);
+                                const pos = {
+                                    lat: position.coords.latitude,
+                                    lng: position.coords.longitude
+                                };
+
+                                if (map && marker) {
+                                    map.setCenter(pos);
+                                    map.setZoom(16);
+                                    marker.setPosition(pos);
+                                    updateLatLng(pos);
+                                }
+
+                                locationStatus.textContent = '✓ Location found (approximate)';
+                                locationStatus.style.color = '#28a745';
+                                currentLocationBtn.disabled = false;
+                                currentLocationBtn.style.opacity = '1';
+
+                                setTimeout(() => {
+                                    locationStatus.textContent = '';
+                                }, 3000);
+                            },
+                            function(fallbackError) {
+                                showGeolocationError(fallbackError);
+                            },
+                            {
+                                enableHighAccuracy: false,
+                                timeout: 15000,
+                                maximumAge: 300000  // 5 minutes cache
+                            }
+                        );
+                    } else {
+                        showGeolocationError(error);
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 30000,  // Increased from 10 seconds to 30 seconds
+                    maximumAge: 60000  // Allow cached location up to 1 minute old
+                }
+            );
+        });
+    }
+
+    function showGeolocationError(error) {
+        console.error('Geolocation error:', error);
+        let errorMessage = 'Unable to get your location';
+
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                errorMessage = 'Location access denied. Please enable location permissions.';
+                break;
+            case error.POSITION_UNAVAILABLE:
+                errorMessage = 'Location information unavailable. Try again later.';
+                break;
+            case error.TIMEOUT:
+                errorMessage = 'Location request timed out. Check your internet connection.';
+                break;
+        }
+
+        locationStatus.textContent = errorMessage;
+        locationStatus.style.color = '#dc3545';
+        currentLocationBtn.disabled = false;
+        currentLocationBtn.style.opacity = '1';
+
+        // Clear error message after 5 seconds
+        setTimeout(() => {
+            locationStatus.textContent = '';
+        }, 5000);
+    }
 }
 
 // Called by Google Maps script when it loads
@@ -824,6 +1000,4 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgp4f8ehEYKHz9a4VC2esQAoxxpCuHWZQ&callback=initMap&libraries=places,geometry&v=3.exp" async defer></script>
 
 {% endblock %}
-
-
 
