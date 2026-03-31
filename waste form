@@ -1,4 +1,3 @@
-
 {% extends 'customer_dashboard.html' %}
 
 {% block title %}Update Waste Profile{% endblock %}
@@ -700,8 +699,53 @@ $(document).ready(function(){
         $.get("/customer-dashboard/load_localbodies/" + districtId + "/", function(data){
             $("#localbody").empty().append('<option value="">-- Select Local Body --</option>');
             data.forEach(function(lb){
+                // Display properly formatted names for Ernakulam local bodies
+                let displayName = lb.name || '';
+                let bt = (lb.body_type || '').toLowerCase();
+                let lower = displayName.toLowerCase();
+                
+                // Handle specific Ernakulam local body name corrections
+                if (displayName.toLowerCase().includes('kadungallur')) {
+                    displayName = 'Kadungallur Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('okkal')) {
+                    displayName = 'Okkal Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('kalady')) {
+                    displayName = 'Kalady Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('koovappady')) {
+                    displayName = 'Koovappady Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('vengola')) {
+                    displayName = 'Vengola Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('alangad')) {
+                    displayName = 'Alangad Panchayat';
+                } else if (displayName.toLowerCase().includes('cheranalloor')) {
+                    displayName = 'Cheranalloor Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('mulavukad')) {
+                    displayName = 'Mulavukad Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('elankunnapuzha')) {
+                    displayName = 'Elankunnapuzha Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('njarakkal')) {
+                    displayName = 'Njarakkal Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('nayarambalam')) {
+                    displayName = 'Nayarambalam Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('mulanthruthy') || displayName.toLowerCase().includes('mulanthuruthy')) {
+                    displayName = 'Mulanthuruthy Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('karumalloor')) {
+                    displayName = 'Karumalloor Grama Panchayat';
+                } else if (displayName.toLowerCase().includes('thiruvaniyoor')) {
+                    displayName = 'Thiruvaniyoor Grama Panchayat';
+                } else {
+                    // Standard formatting for other names
+                    if (bt === 'corporation' && !lower.includes('corporation')) {
+                        displayName = displayName + ' Corporation';
+                    } else if (bt === 'municipality' && !lower.includes('municipality')) {
+                        displayName = displayName + ' Municipality';
+                    } else if (bt === 'panchayat' && !lower.includes('panchayat')) {
+                        displayName = displayName + ' Panchayat';
+                    }
+                }
+                
                 let sel = (lb.id == selectedLocalbody) ? "selected" : "";
-                $("#localbody").append('<option value="'+lb.id+'" '+sel+'>'+lb.name+' ('+lb.body_type+')</option>');
+                $("#localbody").append('<option value="'+lb.id+'" '+sel+'>'+displayName+'</option>');
             });
             if(callback) callback();
         });
@@ -1000,4 +1044,3 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgp4f8ehEYKHz9a4VC2esQAoxxpCuHWZQ&callback=initMap&libraries=places,geometry&v=3.exp" async defer></script>
 
 {% endblock %}
-
